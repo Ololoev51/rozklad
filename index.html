@@ -1,0 +1,2562 @@
+<!doctype html>
+<html lang="uk" class="nojs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<script>document.documentElement.className="";</script>
+<title>Розклад занять — ПР-16 / Ж-26 — І семестр 2026–2027</title>
+<style>
+:root {
+  --bg:#f5f7fb; --card:#fff; --text:#172033; --muted:#687386;
+  --line:#e4e8f0; --accent:#315efb; --accent2:#eef2ff;
+  --green:#087f5b; --greenbg:#e9f8f2;
+}
+* {box-sizing:border-box}
+body {margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.4}
+.container {max-width:1500px;margin:auto;padding:28px 20px 50px}
+.hero {background:linear-gradient(135deg,#172554,#315efb);color:#fff;border-radius:22px;padding:28px 30px;margin-bottom:18px;box-shadow:0 12px 35px rgba(49,94,251,.18)}
+.hero h1 {margin:0 0 8px;font-size:28px}
+.hero p {margin:4px 0;opacity:.9}
+.controls {position:sticky;top:0;z-index:10;background:rgba(245,247,251,.94);backdrop-filter:blur(12px);padding:12px 0}
+.toolbar {display:flex;gap:10px;flex-wrap:wrap;background:var(--card);padding:12px;border:1px solid var(--line);border-radius:15px;box-shadow:0 5px 18px rgba(20,30,50,.05)}
+input {font:inherit}
+#search {flex:1;min-width:230px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;outline:none}
+#searchBtn,#clearBtn {font:inherit;border:1px solid var(--line);background:#fff;padding:10px 13px;border-radius:10px;cursor:pointer}
+#searchBtn {background:var(--accent2);color:#2345c7;font-weight:700}
+.summary {display:flex;gap:10px;flex-wrap:wrap;margin:14px 0}
+.badge {background:#fff;border:1px solid var(--line);padding:7px 11px;border-radius:999px;color:var(--muted);font-size:13px}
+.schedule-area {position:relative}
+.schedule-area > input[type="radio"] {position:absolute;opacity:0;width:1px;height:1px;margin:0;-webkit-appearance:none;appearance:none}
+.month-tabs {display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px;background:var(--card);padding:10px;border:1px solid var(--line);border-radius:15px;box-shadow:0 5px 18px rgba(20,30,50,.05)}
+.month-tabs label {border:1px solid var(--line);background:#fff;padding:9px 13px;border-radius:10px;cursor:pointer;white-space:nowrap;font:inherit}
+.month-tabs label:hover {background:var(--accent2);border-color:#cbd5ff}
+#m-all:checked ~ .month-tabs label[for="m-all"],
+#m-9:checked ~ .month-tabs label[for="m-9"],
+#m-10:checked ~ .month-tabs label[for="m-10"],
+#m-11:checked ~ .month-tabs label[for="m-11"] {background:var(--accent2);border-color:#cbd5ff;color:#2345c7;font-weight:700}
+
+/* Month filtering is CSS-only. It does not depend on JavaScript and works on mobile browsers. */
+#m-9:checked ~ .table-wrap tbody tr:not([data-month="9"]),
+#m-10:checked ~ .table-wrap tbody tr:not([data-month="10"]),
+#m-11:checked ~ .table-wrap tbody tr:not([data-month="11"]) {display:none}
+
+.table-wrap {background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:auto;box-shadow:0 6px 22px rgba(20,30,50,.05)}
+table {width:100%;border-collapse:separate;border-spacing:0;min-width:1050px}
+thead th {position:sticky;top:0;background:#f8f9fc;color:#465066;text-align:left;font-size:12px;text-transform:uppercase;letter-spacing:.04em;padding:13px 14px;border-bottom:1px solid var(--line);white-space:nowrap}
+tbody td {padding:13px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+tbody tr:hover {background:#fafbff}
+tbody tr:last-child td {border-bottom:0}
+.date strong {display:block;font-size:17px}
+.date span {font-size:12px;color:var(--muted)}
+.period {font-weight:700}
+.time {font-size:13px;color:var(--muted);white-space:nowrap}
+.type {display:inline-block;margin-top:6px;padding:3px 7px;border-radius:7px;background:var(--accent2);color:#3852ad;font-size:12px}
+.zoom {display:inline-block;background:var(--greenbg);color:var(--green);font-weight:700;text-decoration:none;padding:7px 9px;border-radius:8px}
+.zoom:hover {text-decoration:underline}
+.zoom-toast {position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#172033;color:#fff;padding:10px 16px;border-radius:10px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:50}
+.zoom-toast.show {opacity:1}
+.meta b + .code {cursor:pointer}
+
+.meta {font-size:12px;color:var(--muted);margin-top:5px;white-space:nowrap}
+.search-hidden {display:none !important}
+#todayBtn {font:inherit;border:1px solid var(--line);background:#fff;padding:10px 13px;border-radius:10px;cursor:pointer}
+#todayBtn {background:var(--greenbg);color:var(--green);font-weight:700}
+tbody tr.is-today > td {background:#fff8d6}
+tbody tr.is-today > td:first-child {box-shadow:inset 4px 0 0 #f5b301}
+
+button,label,a.zoom,.meta.is-code{-webkit-tap-highlight-color:rgba(49,94,251,.15);touch-action:manipulation;cursor:pointer}
+button{-webkit-appearance:none;appearance:none;color:inherit}
+.meta.is-code{display:inline-block}
+.controls{-webkit-backdrop-filter:blur(12px)}
+
+.nojs-note{display:none;background:#fff3cd;border:1px solid #f0d25a;padding:10px 14px;border-radius:12px;margin:0 0 14px;font-size:14px}
+html.nojs .nojs-note{display:block}
+html.nojs .controls{display:none}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+.footer {margin-top:18px;color:var(--muted);font-size:13px}
+@media(max-width:700px){
+ .container{padding:14px 8px 35px}
+ .hero{padding:20px;border-radius:16px}
+ .hero h1{font-size:22px}
+ .toolbar{border-radius:12px}
+ .month-tabs{border-radius:12px}
+ .month-tabs label{flex:1;text-align:center;padding:10px 6px}
+ #searchBtn,#clearBtn{padding:10px 12px}
+ .table-wrap{border-radius:12px}
+
+ /* Мобільний вигляд: кожна пара — окрема картка замість широкої таблиці */
+ .controls{padding:8px 0}
+ .toolbar{padding:10px;gap:8px}
+ #search{flex:1 1 100%;min-width:0}
+ #searchBtn,#clearBtn,#todayBtn{flex:1;padding:10px 8px}
+ .table-wrap{overflow:visible;background:transparent;border:0;box-shadow:none}
+ table,tbody{display:block;width:100%;min-width:0}
+ thead{display:none}
+ tbody tr{display:grid;grid-template-columns:1fr auto;grid-template-areas:"date time" "subj subj" "teach room" "zoom zoom";gap:6px 12px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:10px;box-shadow:0 4px 14px rgba(20,30,50,.05)}
+ tbody tr > td{display:block;padding:0;border:0;background:transparent;min-width:0}
+ tbody tr > td:nth-child(1){grid-area:date;display:flex;align-items:baseline;gap:8px}
+ tbody tr > td:nth-child(2){grid-area:time;text-align:right;white-space:nowrap}
+ tbody tr > td:nth-child(2) br{display:none}
+ tbody tr > td:nth-child(2) .period::after{content:" пара · "}
+ tbody tr > td:nth-child(3){grid-area:subj;font-size:16px}
+ tbody tr > td:nth-child(3) .type{display:block;width:fit-content;margin-top:6px}
+ tbody tr > td:nth-child(4){grid-area:teach;color:var(--muted);font-size:14px}
+ tbody tr > td:nth-child(5){grid-area:room;color:var(--muted);font-size:14px;text-align:right;white-space:nowrap}
+ tbody tr > td:nth-child(5)::before{content:"Ауд. "}
+ tbody tr > td:nth-child(5).no-room{display:none}
+ tbody tr > td:nth-child(6){grid-area:zoom;margin-top:4px}
+ tbody tr > td:nth-child(6) .zoom{display:block;text-align:center;padding:12px 10px;font-size:15px}
+ tbody tr > td:nth-child(6) .meta{display:inline-block;margin:6px 14px 0 0;font-size:13px}
+ tbody tr.is-today{background:#fff8d6;border-color:#f0d25a;box-shadow:inset 4px 0 0 #f5b301,0 4px 14px rgba(20,30,50,.05)}
+ tbody tr.is-today > td,tbody tr.is-today > td:first-child{background:transparent;box-shadow:none}
+}
+</style>
+</head>
+<body>
+<div class="container">
+<div class="nojs-note"><b>Зараз відкрито у режимі перегляду без скриптів</b> (Файли / месенджер) — тому пошук і кнопки вимкнені, а вкладки місяців працюють. Для повної версії відкрийте розклад у Safari за посиланням.</div>
+  <section class="hero">
+    <h1>Розклад занять</h1>
+    <p><b>Кафедра журналістики та міжнародних відносин</b></p>
+    <p>ОС «Бакалавр» · денна форма · І семестр 2026–2027 н.р.</p>
+    <p>Курс 1 · групи <b>ПР-16 / Ж-26</b></p>
+  </section>
+
+  <div class="controls">
+    <div class="toolbar">
+      <input id="search" type="search" inputmode="search" autocomplete="off"
+             placeholder="Пошук: предмет, викладач, дата, аудиторія…">
+      <button id="searchBtn" type="button">Знайти</button>
+      <button id="clearBtn" type="button">Очистити</button>
+      <button id="todayBtn" type="button">Сьогодні</button>
+    </div>
+  </div>
+
+  <div class="summary">
+    <span class="badge">Занять у розкладі: <b id="count">172</b></span>
+    <span class="badge">Час пар: 09:00–15:30</span>
+    <span class="badge">Натискай «Відкрити Zoom» для входу</span>
+  </div>
+
+  <div class="schedule-area">
+    <input type="radio" name="month" id="m-all" checked>
+    <input type="radio" name="month" id="m-9">
+    <input type="radio" name="month" id="m-10">
+    <input type="radio" name="month" id="m-11">
+
+    <div class="month-tabs" aria-label="Вибір місяця">
+      <label for="m-all">Усі</label>
+      <label for="m-9">Вересень</label>
+      <label for="m-10">Жовтень</label>
+      <label for="m-11">Листопад</label>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Дата</th>
+            <th>Пара / час</th>
+            <th>Предмет</th>
+            <th>Викладач</th>
+            <th>Ауд.</th>
+            <th>Zoom / реквізити</th>
+          </tr>
+        </thead>
+        <tbody id="schedule">
+          
+        
+      <tr data-date="01.09.2026" data-month="9" data-subject="штучний інтелект та креатив">
+        <td class="date"><strong>01.09</strong><span>Вт</span></td>
+        <td><span class="period">4</span><br><span class="time">14:10–15:30</span></td>
+        <td><strong>Штучний інтелект та креатив</strong><div class="type">Лекція</div></td>
+        <td>Маранчак М.М.</td>
+        <td>510</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/89975434341?pwd=Q0xGeC9weFllOXZCY0U0Zmh4S24rUT09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 899 7543 4341</div>
+          <div class="meta"><b>Код:</b> Kuk-2023</div>
+        </td>
+      </tr>
+    
+      <tr data-date="02.09.2026" data-month="9" data-subject="історія україни">
+        <td class="date"><strong>02.09</strong><span>Ср</span></td>
+        <td><span class="period">1</span><br><span class="time">09:00–10:20</span></td>
+        <td><strong>Історія України</strong><div class="type">Лекція</div></td>
+        <td>Пилипів В.І.</td>
+        <td>—</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/84385147484?pwd=QmRDLzBUN3hYa1RmSUpnajhwQWljdz09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 843 8514 7484</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="02.09.2026" data-month="9" data-subject="історія україни">
+        <td class="date"><strong>02.09</strong><span>Ср</span></td>
+        <td><span class="period">2</span><br><span class="time">10:40–12:00</span></td>
+        <td><strong>Історія України</strong><div class="type">Лекція</div></td>
+        <td>Пилипів В.І.</td>
+        <td>—</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/84385147484?pwd=QmRDLzBUN3hYa1RmSUpnajhwQWljdz09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 843 8514 7484</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="03.09.2026" data-month="9" data-subject="маркетинг креативних галузей">
+        <td class="date"><strong>03.09</strong><span>Чт</span></td>
+        <td><span class="period">2</span><br><span class="time">10:40–12:00</span></td>
+        <td><strong>Маркетинг креативних галузей</strong><div class="type">Лекція</div></td>
+        <td>Касьян В.В.</td>
+        <td>503</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/83637607993?pwd=NGRIWGtaUkdQL0cvcEdFd1lEOHFDdz09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 836 3760 7993</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="03.09.2026" data-month="9" data-subject="маркетинг креативних галузей">
+        <td class="date"><strong>03.09</strong><span>Чт</span></td>
+        <td><span class="period">3</span><br><span class="time">12:30–14:10</span></td>
+        <td><strong>Маркетинг креативних галузей</strong><div class="type">Практика</div></td>
+        <td>Касьян В.В.</td>
+        <td>503</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/83637607993?pwd=NGRIWGtaUkdQL0cvcEdFd1lEOHFDdz09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 836 3760 7993</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="04.09.2026" data-month="9" data-subject="інформаційні технології, системи та мережі">
+        <td class="date"><strong>04.09</strong><span>Пт</span></td>
+        <td><span class="period">1</span><br><span class="time">09:00–10:20</span></td>
+        <td><strong>Інформаційні технології, системи та мережі</strong><div class="type">Лекція</div></td>
+        <td>Волинець В.О.</td>
+        <td>—</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/87937190793?pwd=9rlWpiJdAIP7r1oqybL2yTxOdQA27o.1" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 879 3719 0793</div>
+          <div class="meta"><b>Код:</b> Kuk-2024</div>
+        </td>
+      </tr>
+    
+      <tr data-date="04.09.2026" data-month="9" data-subject="основи журналістики">
+        <td class="date"><strong>04.09</strong><span>Пт</span></td>
+        <td><span class="period">2</span><br><span class="time">10:40–12:00</span></td>
+        <td><strong>Основи журналістики</strong><div class="type">Лекція</div></td>
+        <td>Редько Т.В.</td>
+        <td>—</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/88611970520?pwd=3ibCSJHaya6sUnhbEZzwEgUdjkWOVd.1" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 886 1197 0520</div>
+          <div class="meta"><b>Код:</b> Kuk-2026</div>
+        </td>
+      </tr>
+    
+      <tr data-date="07.09.2026" data-month="9" data-subject="основи зв’язків з громадськістю та реклама">
+        <td class="date"><strong>07.09</strong><span>Пн</span></td>
+        <td><span class="period">1</span><br><span class="time">09:00–10:20</span></td>
+        <td><strong>Основи зв’язків з громадськістю та реклама</strong><div class="type">Лекція</div></td>
+        <td>Пашкевич М.Ю.</td>
+        <td>504</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/85640710427?pwd=ajA5YUpwRGtpWTRXSVdHek9VYkFKQT09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 856 4071 0427</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="07.09.2026" data-month="9" data-subject="медіаграмотність">
+        <td class="date"><strong>07.09</strong><span>Пн</span></td>
+        <td><span class="period">2</span><br><span class="time">10:40–12:00</span></td>
+        <td><strong>Медіаграмотність</strong><div class="type">Лекція</div></td>
+        <td>Сенченко О.М.</td>
+        <td>510</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/85163629941?pwd=dUJ1TDJMQ3ZsbUNMRVUzcFRFNzB4QT09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 851 6362 9941</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="07.09.2026" data-month="9" data-subject="інформаційні технології, системи та мережі">
+        <td class="date"><strong>07.09</strong><span>Пн</span></td>
+        <td><span class="period">3</span><br><span class="time">12:30–14:10</span></td>
+        <td><strong>Інформаційні технології, системи та мережі</strong><div class="type">Практика</div></td>
+        <td>Волинець В.О.</td>
+        <td>201</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/87937190793?pwd=9rlWpiJdAIP7r1oqybL2yTxOdQA27o.1" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 879 3719 0793</div>
+          <div class="meta"><b>Код:</b> Kuk-2024</div>
+        </td>
+      </tr>
+    
+      <tr data-date="07.09.2026" data-month="9" data-subject="інформаційні технології, системи та мережі">
+        <td class="date"><strong>07.09</strong><span>Пн</span></td>
+        <td><span class="period">4</span><br><span class="time">14:10–15:30</span></td>
+        <td><strong>Інформаційні технології, системи та мережі</strong><div class="type">Практика</div></td>
+        <td>Волинець В.О.</td>
+        <td>201</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/87937190793?pwd=9rlWpiJdAIP7r1oqybL2yTxOdQA27o.1" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 879 3719 0793</div>
+          <div class="meta"><b>Код:</b> Kuk-2024</div>
+        </td>
+      </tr>
+    
+      <tr data-date="08.09.2026" data-month="9" data-subject="штучний інтелект та креатив">
+        <td class="date"><strong>08.09</strong><span>Вт</span></td>
+        <td><span class="period">3</span><br><span class="time">12:30–14:10</span></td>
+        <td><strong>Штучний інтелект та креатив</strong><div class="type">Практика</div></td>
+        <td>Маранчак М.М.</td>
+        <td>510</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/89975434341?pwd=Q0xGeC9weFllOXZCY0U0Zmh4S24rUT09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 899 7543 4341</div>
+          <div class="meta"><b>Код:</b> Kuk-2023</div>
+        </td>
+      </tr>
+    
+      <tr data-date="08.09.2026" data-month="9" data-subject="штучний інтелект та креатив">
+        <td class="date"><strong>08.09</strong><span>Вт</span></td>
+        <td><span class="period">4</span><br><span class="time">14:10–15:30</span></td>
+        <td><strong>Штучний інтелект та креатив</strong><div class="type">Лекція</div></td>
+        <td>Маранчак М.М.</td>
+        <td>510</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/89975434341?pwd=Q0xGeC9weFllOXZCY0U0Zmh4S24rUT09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 899 7543 4341</div>
+          <div class="meta"><b>Код:</b> Kuk-2023</div>
+        </td>
+      </tr>
+    
+      <tr data-date="09.09.2026" data-month="9" data-subject="історія україни">
+        <td class="date"><strong>09.09</strong><span>Ср</span></td>
+        <td><span class="period">1</span><br><span class="time">09:00–10:20</span></td>
+        <td><strong>Історія України</strong><div class="type">Лекція</div></td>
+        <td>Пилипів В.І.</td>
+        <td>—</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/84385147484?pwd=QmRDLzBUN3hYa1RmSUpnajhwQWljdz09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 843 8514 7484</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="09.09.2026" data-month="9" data-subject="історія україни">
+        <td class="date"><strong>09.09</strong><span>Ср</span></td>
+        <td><span class="period">2</span><br><span class="time">10:40–12:00</span></td>
+        <td><strong>Історія України</strong><div class="type">Лекція</div></td>
+        <td>Пилипів В.І.</td>
+        <td>—</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/84385147484?pwd=QmRDLzBUN3hYa1RmSUpnajhwQWljdz09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 843 8514 7484</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="10.09.2026" data-month="9" data-subject="корпоративні комунікації">
+        <td class="date"><strong>10.09</strong><span>Чт</span></td>
+        <td><span class="period">1</span><br><span class="time">09:00–10:20</span></td>
+        <td><strong>Корпоративні комунікації</strong><div class="type">Лекція</div></td>
+        <td>Воронова В.В.</td>
+        <td>504</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/83568494398?pwd=OVlYaFZwUG9FNk5uOElYRlRidkNOdz09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 835 6849 4398</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="10.09.2026" data-month="9" data-subject="маркетинг креативних галузей">
+        <td class="date"><strong>10.09</strong><span>Чт</span></td>
+        <td><span class="period">2</span><br><span class="time">10:40–12:00</span></td>
+        <td><strong>Маркетинг креативних галузей</strong><div class="type">Лекція</div></td>
+        <td>Касьян В.В.</td>
+        <td>503</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/83637607993?pwd=NGRIWGtaUkdQL0cvcEdFd1lEOHFDdz09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 836 3760 7993</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="10.09.2026" data-month="9" data-subject="маркетинг креативних галузей">
+        <td class="date"><strong>10.09</strong><span>Чт</span></td>
+        <td><span class="period">3</span><br><span class="time">12:30–14:10</span></td>
+        <td><strong>Маркетинг креативних галузей</strong><div class="type">Практика</div></td>
+        <td>Касьян В.В.</td>
+        <td>503</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/83637607993?pwd=NGRIWGtaUkdQL0cvcEdFd1lEOHFDdz09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 836 3760 7993</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="10.09.2026" data-month="9" data-subject="інформаційні технології, системи та мережі">
+        <td class="date"><strong>10.09</strong><span>Чт</span></td>
+        <td><span class="period">4</span><br><span class="time">14:10–15:30</span></td>
+        <td><strong>Інформаційні технології, системи та мережі</strong><div class="type">Практика</div></td>
+        <td>Волинець В.О.</td>
+        <td>201</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/87937190793?pwd=9rlWpiJdAIP7r1oqybL2yTxOdQA27o.1" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 879 3719 0793</div>
+          <div class="meta"><b>Код:</b> Kuk-2024</div>
+        </td>
+      </tr>
+    
+      <tr data-date="11.09.2026" data-month="9" data-subject="інформаційні технології, системи та мережі">
+        <td class="date"><strong>11.09</strong><span>Пт</span></td>
+        <td><span class="period">1</span><br><span class="time">09:00–10:20</span></td>
+        <td><strong>Інформаційні технології, системи та мережі</strong><div class="type">Лекція</div></td>
+        <td>Волинець В.О.</td>
+        <td>—</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/87937190793?pwd=9rlWpiJdAIP7r1oqybL2yTxOdQA27o.1" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 879 3719 0793</div>
+          <div class="meta"><b>Код:</b> Kuk-2024</div>
+        </td>
+      </tr>
+    
+      <tr data-date="11.09.2026" data-month="9" data-subject="основи журналістики">
+        <td class="date"><strong>11.09</strong><span>Пт</span></td>
+        <td><span class="period">2</span><br><span class="time">10:40–12:00</span></td>
+        <td><strong>Основи журналістики</strong><div class="type">Лекція</div></td>
+        <td>Редько Т.В.</td>
+        <td>—</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/88611970520?pwd=3ibCSJHaya6sUnhbEZzwEgUdjkWOVd.1" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 886 1197 0520</div>
+          <div class="meta"><b>Код:</b> Kuk-2026</div>
+        </td>
+      </tr>
+    
+      <tr data-date="11.09.2026" data-month="9" data-subject="академічна культура">
+        <td class="date"><strong>11.09</strong><span>Пт</span></td>
+        <td><span class="period">3</span><br><span class="time">12:30–14:10</span></td>
+        <td><strong>Академічна культура</strong><div class="type">Лекція</div></td>
+        <td>Кундеревич О.В.</td>
+        <td>—</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/86713487034?pwd=d0lCaWp6QnBJRnVjVWk1T3dDUldlZz09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 867 1348 7034</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="14.09.2026" data-month="9" data-subject="основи зв’язків з громадськістю та реклама">
+        <td class="date"><strong>14.09</strong><span>Пн</span></td>
+        <td><span class="period">1</span><br><span class="time">09:00–10:20</span></td>
+        <td><strong>Основи зв’язків з громадськістю та реклама</strong><div class="type">Лекція</div></td>
+        <td>Пашкевич М.Ю.</td>
+        <td>504</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/85640710427?pwd=ajA5YUpwRGtpWTRXSVdHek9VYkFKQT09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 856 4071 0427</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="14.09.2026" data-month="9" data-subject="медіаграмотність">
+        <td class="date"><strong>14.09</strong><span>Пн</span></td>
+        <td><span class="period">2</span><br><span class="time">10:40–12:00</span></td>
+        <td><strong>Медіаграмотність</strong><div class="type">Лекція</div></td>
+        <td>Сенченко О.М.</td>
+        <td>510</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/85163629941?pwd=dUJ1TDJMQ3ZsbUNMRVUzcFRFNzB4QT09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 851 6362 9941</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="14.09.2026" data-month="9" data-subject="медіаграмотність">
+        <td class="date"><strong>14.09</strong><span>Пн</span></td>
+        <td><span class="period">3</span><br><span class="time">12:30–14:10</span></td>
+        <td><strong>Медіаграмотність</strong><div class="type">Практика</div></td>
+        <td>Сенченко О.М.</td>
+        <td>510</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/85163629941?pwd=dUJ1TDJMQ3ZsbUNMRVUzcFRFNzB4QT09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 851 6362 9941</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="14.09.2026" data-month="9" data-subject="інформаційні технології, системи та мережі">
+        <td class="date"><strong>14.09</strong><span>Пн</span></td>
+        <td><span class="period">4</span><br><span class="time">14:10–15:30</span></td>
+        <td><strong>Інформаційні технології, системи та мережі</strong><div class="type">Практика</div></td>
+        <td>Волинець В.О.</td>
+        <td>201</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/87937190793?pwd=9rlWpiJdAIP7r1oqybL2yTxOdQA27o.1" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 879 3719 0793</div>
+          <div class="meta"><b>Код:</b> Kuk-2024</div>
+        </td>
+      </tr>
+    
+      <tr data-date="15.09.2026" data-month="9" data-subject="штучний інтелект та креатив">
+        <td class="date"><strong>15.09</strong><span>Вт</span></td>
+        <td><span class="period">3</span><br><span class="time">12:30–14:10</span></td>
+        <td><strong>Штучний інтелект та креатив</strong><div class="type">Практика</div></td>
+        <td>Маранчак М.М.</td>
+        <td>510</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/89975434341?pwd=Q0xGeC9weFllOXZCY0U0Zmh4S24rUT09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 899 7543 4341</div>
+          <div class="meta"><b>Код:</b> Kuk-2023</div>
+        </td>
+      </tr>
+    
+      <tr data-date="15.09.2026" data-month="9" data-subject="штучний інтелект та креатив">
+        <td class="date"><strong>15.09</strong><span>Вт</span></td>
+        <td><span class="period">4</span><br><span class="time">14:10–15:30</span></td>
+        <td><strong>Штучний інтелект та креатив</strong><div class="type">Лекція</div></td>
+        <td>Маранчак М.М.</td>
+        <td>510</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/89975434341?pwd=Q0xGeC9weFllOXZCY0U0Zmh4S24rUT09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 899 7543 4341</div>
+          <div class="meta"><b>Код:</b> Kuk-2023</div>
+        </td>
+      </tr>
+    
+      <tr data-date="16.09.2026" data-month="9" data-subject="історія україни">
+        <td class="date"><strong>16.09</strong><span>Ср</span></td>
+        <td><span class="period">1</span><br><span class="time">09:00–10:20</span></td>
+        <td><strong>Історія України</strong><div class="type">Лекція</div></td>
+        <td>Пилипів В.І.</td>
+        <td>—</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/84385147484?pwd=QmRDLzBUN3hYa1RmSUpnajhwQWljdz09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 843 8514 7484</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="16.09.2026" data-month="9" data-subject="соціальні комунікації">
+        <td class="date"><strong>16.09</strong><span>Ср</span></td>
+        <td><span class="period">2</span><br><span class="time">10:40–12:00</span></td>
+        <td><strong>Соціальні комунікації</strong><div class="type">Лекція</div></td>
+        <td>Маранчак М.М.</td>
+        <td>—</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/89975434341?pwd=Q0xGeC9weFllOXZCY0U0Zmh4S24rUT09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 899 7543 4341</div>
+          <div class="meta"><b>Код:</b> Kuk-2023</div>
+        </td>
+      </tr>
+    
+      <tr data-date="16.09.2026" data-month="9" data-subject="соціальні комунікації">
+        <td class="date"><strong>16.09</strong><span>Ср</span></td>
+        <td><span class="period">3</span><br><span class="time">12:30–14:10</span></td>
+        <td><strong>Соціальні комунікації</strong><div class="type">Лекція</div></td>
+        <td>Маранчак М.М.</td>
+        <td>—</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/89975434341?pwd=Q0xGeC9weFllOXZCY0U0Zmh4S24rUT09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 899 7543 4341</div>
+          <div class="meta"><b>Код:</b> Kuk-2023</div>
+        </td>
+      </tr>
+    
+      <tr data-date="17.09.2026" data-month="9" data-subject="корпоративні комунікації">
+        <td class="date"><strong>17.09</strong><span>Чт</span></td>
+        <td><span class="period">1</span><br><span class="time">09:00–10:20</span></td>
+        <td><strong>Корпоративні комунікації</strong><div class="type">Лекція</div></td>
+        <td>Воронова В.В.</td>
+        <td>504</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/83568494398?pwd=OVlYaFZwUG9FNk5uOElYRlRidkNOdz09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 835 6849 4398</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="17.09.2026" data-month="9" data-subject="корпоративні комунікації">
+        <td class="date"><strong>17.09</strong><span>Чт</span></td>
+        <td><span class="period">2</span><br><span class="time">10:40–12:00</span></td>
+        <td><strong>Корпоративні комунікації</strong><div class="type">Практика</div></td>
+        <td>Воронова В.В.</td>
+        <td>504</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/83568494398?pwd=OVlYaFZwUG9FNk5uOElYRlRidkNOdz09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 835 6849 4398</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="17.09.2026" data-month="9" data-subject="основи зв’язків з громадськістю та реклама">
+        <td class="date"><strong>17.09</strong><span>Чт</span></td>
+        <td><span class="period">3</span><br><span class="time">12:30–14:10</span></td>
+        <td><strong>Основи зв’язків з громадськістю та реклама</strong><div class="type">Практика</div></td>
+        <td>Пашкевич М.Ю.</td>
+        <td>504</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/85640710427?pwd=ajA5YUpwRGtpWTRXSVdHek9VYkFKQT09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 856 4071 0427</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="17.09.2026" data-month="9" data-subject="інформаційні технології, системи та мережі">
+        <td class="date"><strong>17.09</strong><span>Чт</span></td>
+        <td><span class="period">4</span><br><span class="time">14:10–15:30</span></td>
+        <td><strong>Інформаційні технології, системи та мережі</strong><div class="type">Практика</div></td>
+        <td>Волинець В.О.</td>
+        <td>201</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/87937190793?pwd=9rlWpiJdAIP7r1oqybL2yTxOdQA27o.1" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 879 3719 0793</div>
+          <div class="meta"><b>Код:</b> Kuk-2024</div>
+        </td>
+      </tr>
+    
+      <tr data-date="18.09.2026" data-month="9" data-subject="інформаційні технології, системи та мережі">
+        <td class="date"><strong>18.09</strong><span>Пт</span></td>
+        <td><span class="period">1</span><br><span class="time">09:00–10:20</span></td>
+        <td><strong>Інформаційні технології, системи та мережі</strong><div class="type">Лекція</div></td>
+        <td>Волинець В.О.</td>
+        <td>—</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/87937190793?pwd=9rlWpiJdAIP7r1oqybL2yTxOdQA27o.1" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 879 3719 0793</div>
+          <div class="meta"><b>Код:</b> Kuk-2024</div>
+        </td>
+      </tr>
+    
+      <tr data-date="18.09.2026" data-month="9" data-subject="основи журналістики">
+        <td class="date"><strong>18.09</strong><span>Пт</span></td>
+        <td><span class="period">2</span><br><span class="time">10:40–12:00</span></td>
+        <td><strong>Основи журналістики</strong><div class="type">Лекція</div></td>
+        <td>Редько Т.В.</td>
+        <td>—</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/88611970520?pwd=3ibCSJHaya6sUnhbEZzwEgUdjkWOVd.1" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 886 1197 0520</div>
+          <div class="meta"><b>Код:</b> Kuk-2026</div>
+        </td>
+      </tr>
+    
+      <tr data-date="18.09.2026" data-month="9" data-subject="академічна культура">
+        <td class="date"><strong>18.09</strong><span>Пт</span></td>
+        <td><span class="period">3</span><br><span class="time">12:30–14:10</span></td>
+        <td><strong>Академічна культура</strong><div class="type">Лекція</div></td>
+        <td>Кундеревич О.В.</td>
+        <td>—</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/86713487034?pwd=d0lCaWp6QnBJRnVjVWk1T3dDUldlZz09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 867 1348 7034</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="21.09.2026" data-month="9" data-subject="основи зв’язків з громадськістю та реклама">
+        <td class="date"><strong>21.09</strong><span>Пн</span></td>
+        <td><span class="period">1</span><br><span class="time">09:00–10:20</span></td>
+        <td><strong>Основи зв’язків з громадськістю та реклама</strong><div class="type">Лекція</div></td>
+        <td>Пашкевич М.Ю.</td>
+        <td>504</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/85640710427?pwd=ajA5YUpwRGtpWTRXSVdHek9VYkFKQT09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 856 4071 0427</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="21.09.2026" data-month="9" data-subject="медіаграмотність">
+        <td class="date"><strong>21.09</strong><span>Пн</span></td>
+        <td><span class="period">2</span><br><span class="time">10:40–12:00</span></td>
+        <td><strong>Медіаграмотність</strong><div class="type">Лекція</div></td>
+        <td>Сенченко О.М.</td>
+        <td>510</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/85163629941?pwd=dUJ1TDJMQ3ZsbUNMRVUzcFRFNzB4QT09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 851 6362 9941</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="21.09.2026" data-month="9" data-subject="медіаграмотність">
+        <td class="date"><strong>21.09</strong><span>Пн</span></td>
+        <td><span class="period">3</span><br><span class="time">12:30–14:10</span></td>
+        <td><strong>Медіаграмотність</strong><div class="type">Практика</div></td>
+        <td>Сенченко О.М.</td>
+        <td>510</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/85163629941?pwd=dUJ1TDJMQ3ZsbUNMRVUzcFRFNzB4QT09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 851 6362 9941</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="21.09.2026" data-month="9" data-subject="інформаційні технології, системи та мережі">
+        <td class="date"><strong>21.09</strong><span>Пн</span></td>
+        <td><span class="period">4</span><br><span class="time">14:10–15:30</span></td>
+        <td><strong>Інформаційні технології, системи та мережі</strong><div class="type">Практика</div></td>
+        <td>Волинець В.О.</td>
+        <td>201</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/87937190793?pwd=9rlWpiJdAIP7r1oqybL2yTxOdQA27o.1" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 879 3719 0793</div>
+          <div class="meta"><b>Код:</b> Kuk-2024</div>
+        </td>
+      </tr>
+    
+      <tr data-date="22.09.2026" data-month="9" data-subject="штучний інтелект та креатив">
+        <td class="date"><strong>22.09</strong><span>Вт</span></td>
+        <td><span class="period">3</span><br><span class="time">12:30–14:10</span></td>
+        <td><strong>Штучний інтелект та креатив</strong><div class="type">Практика</div></td>
+        <td>Маранчак М.М.</td>
+        <td>510</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/89975434341?pwd=Q0xGeC9weFllOXZCY0U0Zmh4S24rUT09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 899 7543 4341</div>
+          <div class="meta"><b>Код:</b> Kuk-2023</div>
+        </td>
+      </tr>
+    
+      <tr data-date="22.09.2026" data-month="9" data-subject="штучний інтелект та креатив">
+        <td class="date"><strong>22.09</strong><span>Вт</span></td>
+        <td><span class="period">4</span><br><span class="time">14:10–15:30</span></td>
+        <td><strong>Штучний інтелект та креатив</strong><div class="type">Лекція</div></td>
+        <td>Маранчак М.М.</td>
+        <td>510</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/89975434341?pwd=Q0xGeC9weFllOXZCY0U0Zmh4S24rUT09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 899 7543 4341</div>
+          <div class="meta"><b>Код:</b> Kuk-2023</div>
+        </td>
+      </tr>
+    
+      <tr data-date="23.09.2026" data-month="9" data-subject="історія україни">
+        <td class="date"><strong>23.09</strong><span>Ср</span></td>
+        <td><span class="period">1</span><br><span class="time">09:00–10:20</span></td>
+        <td><strong>Історія України</strong><div class="type">Лекція</div></td>
+        <td>Пилипів В.І.</td>
+        <td>—</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/84385147484?pwd=QmRDLzBUN3hYa1RmSUpnajhwQWljdz09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 843 8514 7484</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="23.09.2026" data-month="9" data-subject="історія україни">
+        <td class="date"><strong>23.09</strong><span>Ср</span></td>
+        <td><span class="period">2</span><br><span class="time">10:40–12:00</span></td>
+        <td><strong>Історія України</strong><div class="type">Лекція</div></td>
+        <td>Пилипів В.І.</td>
+        <td>—</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/84385147484?pwd=QmRDLzBUN3hYa1RmSUpnajhwQWljdz09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 843 8514 7484</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="24.09.2026" data-month="9" data-subject="корпоративні комунікації">
+        <td class="date"><strong>24.09</strong><span>Чт</span></td>
+        <td><span class="period">1</span><br><span class="time">09:00–10:20</span></td>
+        <td><strong>Корпоративні комунікації</strong><div class="type">Лекція</div></td>
+        <td>Воронова В.В.</td>
+        <td>504</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/83568494398?pwd=OVlYaFZwUG9FNk5uOElYRlRidkNOdz09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 835 6849 4398</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="24.09.2026" data-month="9" data-subject="корпоративні комунікації">
+        <td class="date"><strong>24.09</strong><span>Чт</span></td>
+        <td><span class="period">2</span><br><span class="time">10:40–12:00</span></td>
+        <td><strong>Корпоративні комунікації</strong><div class="type">Практика</div></td>
+        <td>Воронова В.В.</td>
+        <td>504</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/83568494398?pwd=OVlYaFZwUG9FNk5uOElYRlRidkNOdz09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 835 6849 4398</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="24.09.2026" data-month="9" data-subject="основи зв’язків з громадськістю та реклама">
+        <td class="date"><strong>24.09</strong><span>Чт</span></td>
+        <td><span class="period">3</span><br><span class="time">12:30–14:10</span></td>
+        <td><strong>Основи зв’язків з громадськістю та реклама</strong><div class="type">Практика</div></td>
+        <td>Пашкевич М.Ю.</td>
+        <td>504</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/85640710427?pwd=ajA5YUpwRGtpWTRXSVdHek9VYkFKQT09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 856 4071 0427</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="24.09.2026" data-month="9" data-subject="інформаційні технології, системи та мережі">
+        <td class="date"><strong>24.09</strong><span>Чт</span></td>
+        <td><span class="period">4</span><br><span class="time">14:10–15:30</span></td>
+        <td><strong>Інформаційні технології, системи та мережі</strong><div class="type">Практика</div></td>
+        <td>Волинець В.О.</td>
+        <td>201</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/87937190793?pwd=9rlWpiJdAIP7r1oqybL2yTxOdQA27o.1" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 879 3719 0793</div>
+          <div class="meta"><b>Код:</b> Kuk-2024</div>
+        </td>
+      </tr>
+    
+      <tr data-date="25.09.2026" data-month="9" data-subject="інформаційні технології, системи та мережі">
+        <td class="date"><strong>25.09</strong><span>Пт</span></td>
+        <td><span class="period">1</span><br><span class="time">09:00–10:20</span></td>
+        <td><strong>Інформаційні технології, системи та мережі</strong><div class="type">Лекція</div></td>
+        <td>Волинець В.О.</td>
+        <td>—</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/87937190793?pwd=9rlWpiJdAIP7r1oqybL2yTxOdQA27o.1" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 879 3719 0793</div>
+          <div class="meta"><b>Код:</b> Kuk-2024</div>
+        </td>
+      </tr>
+    
+      <tr data-date="25.09.2026" data-month="9" data-subject="основи журналістики">
+        <td class="date"><strong>25.09</strong><span>Пт</span></td>
+        <td><span class="period">2</span><br><span class="time">10:40–12:00</span></td>
+        <td><strong>Основи журналістики</strong><div class="type">Лекція</div></td>
+        <td>Редько Т.В.</td>
+        <td>—</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/88611970520?pwd=3ibCSJHaya6sUnhbEZzwEgUdjkWOVd.1" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 886 1197 0520</div>
+          <div class="meta"><b>Код:</b> Kuk-2026</div>
+        </td>
+      </tr>
+    
+      <tr data-date="25.09.2026" data-month="9" data-subject="академічна культура">
+        <td class="date"><strong>25.09</strong><span>Пт</span></td>
+        <td><span class="period">3</span><br><span class="time">12:30–14:10</span></td>
+        <td><strong>Академічна культура</strong><div class="type">Лекція</div></td>
+        <td>Кундеревич О.В.</td>
+        <td>—</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/86713487034?pwd=d0lCaWp6QnBJRnVjVWk1T3dDUldlZz09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 867 1348 7034</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="28.09.2026" data-month="9" data-subject="медіаграмотність">
+        <td class="date"><strong>28.09</strong><span>Пн</span></td>
+        <td><span class="period">2</span><br><span class="time">10:40–12:00</span></td>
+        <td><strong>Медіаграмотність</strong><div class="type">Лекція</div></td>
+        <td>Сенченко О.М.</td>
+        <td>510</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/85163629941?pwd=dUJ1TDJMQ3ZsbUNMRVUzcFRFNzB4QT09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 851 6362 9941</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="28.09.2026" data-month="9" data-subject="медіаграмотність">
+        <td class="date"><strong>28.09</strong><span>Пн</span></td>
+        <td><span class="period">3</span><br><span class="time">12:30–14:10</span></td>
+        <td><strong>Медіаграмотність</strong><div class="type">Практика</div></td>
+        <td>Сенченко О.М.</td>
+        <td>510</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/85163629941?pwd=dUJ1TDJMQ3ZsbUNMRVUzcFRFNzB4QT09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 851 6362 9941</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="28.09.2026" data-month="9" data-subject="інформаційні технології, системи та мережі">
+        <td class="date"><strong>28.09</strong><span>Пн</span></td>
+        <td><span class="period">4</span><br><span class="time">14:10–15:30</span></td>
+        <td><strong>Інформаційні технології, системи та мережі</strong><div class="type">Практика</div></td>
+        <td>Волинець В.О.</td>
+        <td>201</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/87937190793?pwd=9rlWpiJdAIP7r1oqybL2yTxOdQA27o.1" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 879 3719 0793</div>
+          <div class="meta"><b>Код:</b> Kuk-2024</div>
+        </td>
+      </tr>
+    
+      <tr data-date="29.09.2026" data-month="9" data-subject="штучний інтелект та креатив">
+        <td class="date"><strong>29.09</strong><span>Вт</span></td>
+        <td><span class="period">3</span><br><span class="time">12:30–14:10</span></td>
+        <td><strong>Штучний інтелект та креатив</strong><div class="type">Практика</div></td>
+        <td>Маранчак М.М.</td>
+        <td>510</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/89975434341?pwd=Q0xGeC9weFllOXZCY0U0Zmh4S24rUT09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 899 7543 4341</div>
+          <div class="meta"><b>Код:</b> Kuk-2023</div>
+        </td>
+      </tr>
+    
+      <tr data-date="29.09.2026" data-month="9" data-subject="штучний інтелект та креатив">
+        <td class="date"><strong>29.09</strong><span>Вт</span></td>
+        <td><span class="period">4</span><br><span class="time">14:10–15:30</span></td>
+        <td><strong>Штучний інтелект та креатив</strong><div class="type">Лекція</div></td>
+        <td>Маранчак М.М.</td>
+        <td>510</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/89975434341?pwd=Q0xGeC9weFllOXZCY0U0Zmh4S24rUT09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 899 7543 4341</div>
+          <div class="meta"><b>Код:</b> Kuk-2023</div>
+        </td>
+      </tr>
+    
+      <tr data-date="30.09.2026" data-month="9" data-subject="історія україни">
+        <td class="date"><strong>30.09</strong><span>Ср</span></td>
+        <td><span class="period">1</span><br><span class="time">09:00–10:20</span></td>
+        <td><strong>Історія України</strong><div class="type">Лекція</div></td>
+        <td>Пилипів В.І.</td>
+        <td>—</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/84385147484?pwd=QmRDLzBUN3hYa1RmSUpnajhwQWljdz09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 843 8514 7484</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="30.09.2026" data-month="9" data-subject="соціальні комунікації">
+        <td class="date"><strong>30.09</strong><span>Ср</span></td>
+        <td><span class="period">2</span><br><span class="time">10:40–12:00</span></td>
+        <td><strong>Соціальні комунікації</strong><div class="type">Лекція</div></td>
+        <td>Маранчак М.М.</td>
+        <td>—</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/89975434341?pwd=Q0xGeC9weFllOXZCY0U0Zmh4S24rUT09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 899 7543 4341</div>
+          <div class="meta"><b>Код:</b> Kuk-2023</div>
+        </td>
+      </tr>
+    
+      <tr data-date="01.10.2026" data-month="10" data-subject="корпоративні комунікації">
+        <td class="date"><strong>01.10</strong><span>Чт</span></td>
+        <td><span class="period">1</span><br><span class="time">09:00–10:20</span></td>
+        <td><strong>Корпоративні комунікації</strong><div class="type">Лекція</div></td>
+        <td>Воронова В.В.</td>
+        <td>504</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/83568494398?pwd=OVlYaFZwUG9FNk5uOElYRlRidkNOdz09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 835 6849 4398</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="01.10.2026" data-month="10" data-subject="корпоративні комунікації">
+        <td class="date"><strong>01.10</strong><span>Чт</span></td>
+        <td><span class="period">2</span><br><span class="time">10:40–12:00</span></td>
+        <td><strong>Корпоративні комунікації</strong><div class="type">Практика</div></td>
+        <td>Воронова В.В.</td>
+        <td>504</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/83568494398?pwd=OVlYaFZwUG9FNk5uOElYRlRidkNOdz09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 835 6849 4398</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="01.10.2026" data-month="10" data-subject="основи журналістики">
+        <td class="date"><strong>01.10</strong><span>Чт</span></td>
+        <td><span class="period">3</span><br><span class="time">12:30–14:10</span></td>
+        <td><strong>Основи журналістики</strong><div class="type">Лекція</div></td>
+        <td>Редько Т.В.</td>
+        <td>504</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/88611970520?pwd=3ibCSJHaya6sUnhbEZzwEgUdjkWOVd.1" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 886 1197 0520</div>
+          <div class="meta"><b>Код:</b> Kuk-2026</div>
+        </td>
+      </tr>
+    
+      <tr data-date="01.10.2026" data-month="10" data-subject="основи журналістики">
+        <td class="date"><strong>01.10</strong><span>Чт</span></td>
+        <td><span class="period">4</span><br><span class="time">14:10–15:30</span></td>
+        <td><strong>Основи журналістики</strong><div class="type">Практика</div></td>
+        <td>Редько Т.В.</td>
+        <td>504</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/88611970520?pwd=3ibCSJHaya6sUnhbEZzwEgUdjkWOVd.1" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 886 1197 0520</div>
+          <div class="meta"><b>Код:</b> Kuk-2026</div>
+        </td>
+      </tr>
+    
+      <tr data-date="02.10.2026" data-month="10" data-subject="інформаційні технології, системи та мережі">
+        <td class="date"><strong>02.10</strong><span>Пт</span></td>
+        <td><span class="period">1</span><br><span class="time">09:00–10:20</span></td>
+        <td><strong>Інформаційні технології, системи та мережі</strong><div class="type">Лекція</div></td>
+        <td>Волинець В.О.</td>
+        <td>—</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/87937190793?pwd=9rlWpiJdAIP7r1oqybL2yTxOdQA27o.1" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 879 3719 0793</div>
+          <div class="meta"><b>Код:</b> Kuk-2024</div>
+        </td>
+      </tr>
+    
+      <tr data-date="02.10.2026" data-month="10" data-subject="основи журналістики">
+        <td class="date"><strong>02.10</strong><span>Пт</span></td>
+        <td><span class="period">2</span><br><span class="time">10:40–12:00</span></td>
+        <td><strong>Основи журналістики</strong><div class="type">Лекція</div></td>
+        <td>Редько Т.В.</td>
+        <td>—</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/88611970520?pwd=3ibCSJHaya6sUnhbEZzwEgUdjkWOVd.1" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 886 1197 0520</div>
+          <div class="meta"><b>Код:</b> Kuk-2026</div>
+        </td>
+      </tr>
+    
+      <tr data-date="02.10.2026" data-month="10" data-subject="академічна культура">
+        <td class="date"><strong>02.10</strong><span>Пт</span></td>
+        <td><span class="period">3</span><br><span class="time">12:30–14:10</span></td>
+        <td><strong>Академічна культура</strong><div class="type">Лекція</div></td>
+        <td>Кундеревич О.В.</td>
+        <td>—</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/86713487034?pwd=d0lCaWp6QnBJRnVjVWk1T3dDUldlZz09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 867 1348 7034</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="05.10.2026" data-month="10" data-subject="основи зв’язків з громадськістю та реклама">
+        <td class="date"><strong>05.10</strong><span>Пн</span></td>
+        <td><span class="period">1</span><br><span class="time">09:00–10:20</span></td>
+        <td><strong>Основи зв’язків з громадськістю та реклама</strong><div class="type">Лекція</div></td>
+        <td>Пашкевич М.Ю.</td>
+        <td>504</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/85640710427?pwd=ajA5YUpwRGtpWTRXSVdHek9VYkFKQT09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 856 4071 0427</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="05.10.2026" data-month="10" data-subject="медіаграмотність">
+        <td class="date"><strong>05.10</strong><span>Пн</span></td>
+        <td><span class="period">2</span><br><span class="time">10:40–12:00</span></td>
+        <td><strong>Медіаграмотність</strong><div class="type">Лекція</div></td>
+        <td>Сенченко О.М.</td>
+        <td>510</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/85163629941?pwd=dUJ1TDJMQ3ZsbUNMRVUzcFRFNzB4QT09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 851 6362 9941</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="05.10.2026" data-month="10" data-subject="інформаційні технології, системи та мережі">
+        <td class="date"><strong>05.10</strong><span>Пн</span></td>
+        <td><span class="period">4</span><br><span class="time">14:10–15:30</span></td>
+        <td><strong>Інформаційні технології, системи та мережі</strong><div class="type">Практика</div></td>
+        <td>Волинець В.О.</td>
+        <td>201</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/87937190793?pwd=9rlWpiJdAIP7r1oqybL2yTxOdQA27o.1" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 879 3719 0793</div>
+          <div class="meta"><b>Код:</b> Kuk-2024</div>
+        </td>
+      </tr>
+    
+      <tr data-date="06.10.2026" data-month="10" data-subject="маркетинг креативних галузей">
+        <td class="date"><strong>06.10</strong><span>Вт</span></td>
+        <td><span class="period">2</span><br><span class="time">10:40–12:00</span></td>
+        <td><strong>Маркетинг креативних галузей</strong><div class="type">Лекція</div></td>
+        <td>Касьян В.В.</td>
+        <td>503</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/83637607993?pwd=NGRIWGtaUkdQL0cvcEdFd1lEOHFDdz09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 836 3760 7993</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="06.10.2026" data-month="10" data-subject="штучний інтелект та креатив">
+        <td class="date"><strong>06.10</strong><span>Вт</span></td>
+        <td><span class="period">3</span><br><span class="time">12:30–14:10</span></td>
+        <td><strong>Штучний інтелект та креатив</strong><div class="type">Практика</div></td>
+        <td>Маранчак М.М.</td>
+        <td>510</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/89975434341?pwd=Q0xGeC9weFllOXZCY0U0Zmh4S24rUT09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 899 7543 4341</div>
+          <div class="meta"><b>Код:</b> Kuk-2023</div>
+        </td>
+      </tr>
+    
+      <tr data-date="06.10.2026" data-month="10" data-subject="штучний інтелект та креатив">
+        <td class="date"><strong>06.10</strong><span>Вт</span></td>
+        <td><span class="period">4</span><br><span class="time">14:10–15:30</span></td>
+        <td><strong>Штучний інтелект та креатив</strong><div class="type">Лекція</div></td>
+        <td>Маранчак М.М.</td>
+        <td>510</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/89975434341?pwd=Q0xGeC9weFllOXZCY0U0Zmh4S24rUT09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 899 7543 4341</div>
+          <div class="meta"><b>Код:</b> Kuk-2023</div>
+        </td>
+      </tr>
+    
+      <tr data-date="07.10.2026" data-month="10" data-subject="соціальні комунікації">
+        <td class="date"><strong>07.10</strong><span>Ср</span></td>
+        <td><span class="period">2</span><br><span class="time">10:40–12:00</span></td>
+        <td><strong>Соціальні комунікації</strong><div class="type">Лекція</div></td>
+        <td>Маранчак М.М.</td>
+        <td>—</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/89975434341?pwd=Q0xGeC9weFllOXZCY0U0Zmh4S24rUT09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 899 7543 4341</div>
+          <div class="meta"><b>Код:</b> Kuk-2023</div>
+        </td>
+      </tr>
+    
+      <tr data-date="07.10.2026" data-month="10" data-subject="соціальні комунікації">
+        <td class="date"><strong>07.10</strong><span>Ср</span></td>
+        <td><span class="period">3</span><br><span class="time">12:30–14:10</span></td>
+        <td><strong>Соціальні комунікації</strong><div class="type">Лекція</div></td>
+        <td>Маранчак М.М.</td>
+        <td>—</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/89975434341?pwd=Q0xGeC9weFllOXZCY0U0Zmh4S24rUT09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 899 7543 4341</div>
+          <div class="meta"><b>Код:</b> Kuk-2023</div>
+        </td>
+      </tr>
+    
+      <tr data-date="08.10.2026" data-month="10" data-subject="корпоративні комунікації">
+        <td class="date"><strong>08.10</strong><span>Чт</span></td>
+        <td><span class="period">1</span><br><span class="time">09:00–10:20</span></td>
+        <td><strong>Корпоративні комунікації</strong><div class="type">Лекція</div></td>
+        <td>Воронова В.В.</td>
+        <td>504</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/83568494398?pwd=OVlYaFZwUG9FNk5uOElYRlRidkNOdz09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 835 6849 4398</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="08.10.2026" data-month="10" data-subject="корпоративні комунікації">
+        <td class="date"><strong>08.10</strong><span>Чт</span></td>
+        <td><span class="period">2</span><br><span class="time">10:40–12:00</span></td>
+        <td><strong>Корпоративні комунікації</strong><div class="type">Практика</div></td>
+        <td>Воронова В.В.</td>
+        <td>504</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/83568494398?pwd=OVlYaFZwUG9FNk5uOElYRlRidkNOdz09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 835 6849 4398</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="08.10.2026" data-month="10" data-subject="основи зв’язків з громадськістю та реклама">
+        <td class="date"><strong>08.10</strong><span>Чт</span></td>
+        <td><span class="period">3</span><br><span class="time">12:30–14:10</span></td>
+        <td><strong>Основи зв’язків з громадськістю та реклама</strong><div class="type">Практика</div></td>
+        <td>Пашкевич М.Ю.</td>
+        <td>504</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/85640710427?pwd=ajA5YUpwRGtpWTRXSVdHek9VYkFKQT09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 856 4071 0427</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="08.10.2026" data-month="10" data-subject="інформаційні технології, системи та мережі">
+        <td class="date"><strong>08.10</strong><span>Чт</span></td>
+        <td><span class="period">4</span><br><span class="time">14:10–15:30</span></td>
+        <td><strong>Інформаційні технології, системи та мережі</strong><div class="type">Практика</div></td>
+        <td>Волинець В.О.</td>
+        <td>201</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/87937190793?pwd=9rlWpiJdAIP7r1oqybL2yTxOdQA27o.1" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 879 3719 0793</div>
+          <div class="meta"><b>Код:</b> Kuk-2024</div>
+        </td>
+      </tr>
+    
+      <tr data-date="09.10.2026" data-month="10" data-subject="інформаційні технології, системи та мережі">
+        <td class="date"><strong>09.10</strong><span>Пт</span></td>
+        <td><span class="period">1</span><br><span class="time">09:00–10:20</span></td>
+        <td><strong>Інформаційні технології, системи та мережі</strong><div class="type">Лекція</div></td>
+        <td>Волинець В.О.</td>
+        <td>—</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/87937190793?pwd=9rlWpiJdAIP7r1oqybL2yTxOdQA27o.1" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 879 3719 0793</div>
+          <div class="meta"><b>Код:</b> Kuk-2024</div>
+        </td>
+      </tr>
+    
+      <tr data-date="09.10.2026" data-month="10" data-subject="основи журналістики">
+        <td class="date"><strong>09.10</strong><span>Пт</span></td>
+        <td><span class="period">2</span><br><span class="time">10:40–12:00</span></td>
+        <td><strong>Основи журналістики</strong><div class="type">Лекція</div></td>
+        <td>Редько Т.В.</td>
+        <td>—</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/88611970520?pwd=3ibCSJHaya6sUnhbEZzwEgUdjkWOVd.1" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 886 1197 0520</div>
+          <div class="meta"><b>Код:</b> Kuk-2026</div>
+        </td>
+      </tr>
+    
+      <tr data-date="09.10.2026" data-month="10" data-subject="академічна культура">
+        <td class="date"><strong>09.10</strong><span>Пт</span></td>
+        <td><span class="period">3</span><br><span class="time">12:30–14:10</span></td>
+        <td><strong>Академічна культура</strong><div class="type">Лекція</div></td>
+        <td>Кундеревич О.В.</td>
+        <td>—</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/86713487034?pwd=d0lCaWp6QnBJRnVjVWk1T3dDUldlZz09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 867 1348 7034</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="12.10.2026" data-month="10" data-subject="основи зв’язків з громадськістю та реклама">
+        <td class="date"><strong>12.10</strong><span>Пн</span></td>
+        <td><span class="period">1</span><br><span class="time">09:00–10:20</span></td>
+        <td><strong>Основи зв’язків з громадськістю та реклама</strong><div class="type">Лекція</div></td>
+        <td>Пашкевич М.Ю.</td>
+        <td>504</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/85640710427?pwd=ajA5YUpwRGtpWTRXSVdHek9VYkFKQT09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 856 4071 0427</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="12.10.2026" data-month="10" data-subject="медіаграмотність">
+        <td class="date"><strong>12.10</strong><span>Пн</span></td>
+        <td><span class="period">2</span><br><span class="time">10:40–12:00</span></td>
+        <td><strong>Медіаграмотність</strong><div class="type">Лекція</div></td>
+        <td>Сенченко О.М.</td>
+        <td>510</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/85163629941?pwd=dUJ1TDJMQ3ZsbUNMRVUzcFRFNzB4QT09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 851 6362 9941</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="12.10.2026" data-month="10" data-subject="медіаграмотність">
+        <td class="date"><strong>12.10</strong><span>Пн</span></td>
+        <td><span class="period">3</span><br><span class="time">12:30–14:10</span></td>
+        <td><strong>Медіаграмотність</strong><div class="type">Практика</div></td>
+        <td>Сенченко О.М.</td>
+        <td>510</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/85163629941?pwd=dUJ1TDJMQ3ZsbUNMRVUzcFRFNzB4QT09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 851 6362 9941</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="12.10.2026" data-month="10" data-subject="інформаційні технології, системи та мережі">
+        <td class="date"><strong>12.10</strong><span>Пн</span></td>
+        <td><span class="period">4</span><br><span class="time">14:10–15:30</span></td>
+        <td><strong>Інформаційні технології, системи та мережі</strong><div class="type">Практика</div></td>
+        <td>Волинець В.О.</td>
+        <td>201</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/87937190793?pwd=9rlWpiJdAIP7r1oqybL2yTxOdQA27o.1" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 879 3719 0793</div>
+          <div class="meta"><b>Код:</b> Kuk-2024</div>
+        </td>
+      </tr>
+    
+      <tr data-date="13.10.2026" data-month="10" data-subject="маркетинг креативних галузей">
+        <td class="date"><strong>13.10</strong><span>Вт</span></td>
+        <td><span class="period">2</span><br><span class="time">10:40–12:00</span></td>
+        <td><strong>Маркетинг креативних галузей</strong><div class="type">Лекція</div></td>
+        <td>Касьян В.В.</td>
+        <td>503</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/83637607993?pwd=NGRIWGtaUkdQL0cvcEdFd1lEOHFDdz09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 836 3760 7993</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="13.10.2026" data-month="10" data-subject="штучний інтелект та креатив">
+        <td class="date"><strong>13.10</strong><span>Вт</span></td>
+        <td><span class="period">3</span><br><span class="time">12:30–14:10</span></td>
+        <td><strong>Штучний інтелект та креатив</strong><div class="type">Практика</div></td>
+        <td>Маранчак М.М.</td>
+        <td>510</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/89975434341?pwd=Q0xGeC9weFllOXZCY0U0Zmh4S24rUT09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 899 7543 4341</div>
+          <div class="meta"><b>Код:</b> Kuk-2023</div>
+        </td>
+      </tr>
+    
+      <tr data-date="13.10.2026" data-month="10" data-subject="штучний інтелект та креатив">
+        <td class="date"><strong>13.10</strong><span>Вт</span></td>
+        <td><span class="period">4</span><br><span class="time">14:10–15:30</span></td>
+        <td><strong>Штучний інтелект та креатив</strong><div class="type">Лекція</div></td>
+        <td>Маранчак М.М.</td>
+        <td>510</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/89975434341?pwd=Q0xGeC9weFllOXZCY0U0Zmh4S24rUT09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 899 7543 4341</div>
+          <div class="meta"><b>Код:</b> Kuk-2023</div>
+        </td>
+      </tr>
+    
+      <tr data-date="14.10.2026" data-month="10" data-subject="історія україни">
+        <td class="date"><strong>14.10</strong><span>Ср</span></td>
+        <td><span class="period">1</span><br><span class="time">09:00–10:20</span></td>
+        <td><strong>Історія України</strong><div class="type">Лекція</div></td>
+        <td>Пилипів В.І.</td>
+        <td>—</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/84385147484?pwd=QmRDLzBUN3hYa1RmSUpnajhwQWljdz09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 843 8514 7484</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="14.10.2026" data-month="10" data-subject="соціальні комунікації">
+        <td class="date"><strong>14.10</strong><span>Ср</span></td>
+        <td><span class="period">2</span><br><span class="time">10:40–12:00</span></td>
+        <td><strong>Соціальні комунікації</strong><div class="type">Лекція</div></td>
+        <td>Маранчак М.М.</td>
+        <td>—</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/89975434341?pwd=Q0xGeC9weFllOXZCY0U0Zmh4S24rUT09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 899 7543 4341</div>
+          <div class="meta"><b>Код:</b> Kuk-2023</div>
+        </td>
+      </tr>
+    
+      <tr data-date="14.10.2026" data-month="10" data-subject="соціальні комунікації">
+        <td class="date"><strong>14.10</strong><span>Ср</span></td>
+        <td><span class="period">3</span><br><span class="time">12:30–14:10</span></td>
+        <td><strong>Соціальні комунікації</strong><div class="type">Лекція</div></td>
+        <td>Маранчак М.М.</td>
+        <td>—</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/89975434341?pwd=Q0xGeC9weFllOXZCY0U0Zmh4S24rUT09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 899 7543 4341</div>
+          <div class="meta"><b>Код:</b> Kuk-2023</div>
+        </td>
+      </tr>
+    
+      <tr data-date="15.10.2026" data-month="10" data-subject="корпоративні комунікації">
+        <td class="date"><strong>15.10</strong><span>Чт</span></td>
+        <td><span class="period">1</span><br><span class="time">09:00–10:20</span></td>
+        <td><strong>Корпоративні комунікації</strong><div class="type">Лекція</div></td>
+        <td>Воронова В.В.</td>
+        <td>504</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/83568494398?pwd=OVlYaFZwUG9FNk5uOElYRlRidkNOdz09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 835 6849 4398</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="15.10.2026" data-month="10" data-subject="корпоративні комунікації">
+        <td class="date"><strong>15.10</strong><span>Чт</span></td>
+        <td><span class="period">2</span><br><span class="time">10:40–12:00</span></td>
+        <td><strong>Корпоративні комунікації</strong><div class="type">Практика</div></td>
+        <td>Воронова В.В.</td>
+        <td>504</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/83568494398?pwd=OVlYaFZwUG9FNk5uOElYRlRidkNOdz09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 835 6849 4398</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="15.10.2026" data-month="10" data-subject="основи журналістики">
+        <td class="date"><strong>15.10</strong><span>Чт</span></td>
+        <td><span class="period">3</span><br><span class="time">12:30–14:10</span></td>
+        <td><strong>Основи журналістики</strong><div class="type">Лекція</div></td>
+        <td>Редько Т.В.</td>
+        <td>504</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/88611970520?pwd=3ibCSJHaya6sUnhbEZzwEgUdjkWOVd.1" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 886 1197 0520</div>
+          <div class="meta"><b>Код:</b> Kuk-2026</div>
+        </td>
+      </tr>
+    
+      <tr data-date="15.10.2026" data-month="10" data-subject="основи журналістики">
+        <td class="date"><strong>15.10</strong><span>Чт</span></td>
+        <td><span class="period">4</span><br><span class="time">14:10–15:30</span></td>
+        <td><strong>Основи журналістики</strong><div class="type">Практика</div></td>
+        <td>Редько Т.В.</td>
+        <td>504</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/88611970520?pwd=3ibCSJHaya6sUnhbEZzwEgUdjkWOVd.1" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 886 1197 0520</div>
+          <div class="meta"><b>Код:</b> Kuk-2026</div>
+        </td>
+      </tr>
+    
+      <tr data-date="16.10.2026" data-month="10" data-subject="інформаційні технології, системи та мережі">
+        <td class="date"><strong>16.10</strong><span>Пт</span></td>
+        <td><span class="period">1</span><br><span class="time">09:00–10:20</span></td>
+        <td><strong>Інформаційні технології, системи та мережі</strong><div class="type">Лекція</div></td>
+        <td>Волинець В.О.</td>
+        <td>—</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/87937190793?pwd=9rlWpiJdAIP7r1oqybL2yTxOdQA27o.1" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 879 3719 0793</div>
+          <div class="meta"><b>Код:</b> Kuk-2024</div>
+        </td>
+      </tr>
+    
+      <tr data-date="16.10.2026" data-month="10" data-subject="основи журналістики">
+        <td class="date"><strong>16.10</strong><span>Пт</span></td>
+        <td><span class="period">2</span><br><span class="time">10:40–12:00</span></td>
+        <td><strong>Основи журналістики</strong><div class="type">Лекція</div></td>
+        <td>Редько Т.В.</td>
+        <td>—</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/88611970520?pwd=3ibCSJHaya6sUnhbEZzwEgUdjkWOVd.1" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 886 1197 0520</div>
+          <div class="meta"><b>Код:</b> Kuk-2026</div>
+        </td>
+      </tr>
+    
+      <tr data-date="16.10.2026" data-month="10" data-subject="академічна культура">
+        <td class="date"><strong>16.10</strong><span>Пт</span></td>
+        <td><span class="period">3</span><br><span class="time">12:30–14:10</span></td>
+        <td><strong>Академічна культура</strong><div class="type">Лекція</div></td>
+        <td>Кундеревич О.В.</td>
+        <td>—</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/86713487034?pwd=d0lCaWp6QnBJRnVjVWk1T3dDUldlZz09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 867 1348 7034</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="19.10.2026" data-month="10" data-subject="основи зв’язків з громадськістю та реклама">
+        <td class="date"><strong>19.10</strong><span>Пн</span></td>
+        <td><span class="period">1</span><br><span class="time">09:00–10:20</span></td>
+        <td><strong>Основи зв’язків з громадськістю та реклама</strong><div class="type">Лекція</div></td>
+        <td>Пашкевич М.Ю.</td>
+        <td>504</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/85640710427?pwd=ajA5YUpwRGtpWTRXSVdHek9VYkFKQT09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 856 4071 0427</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="19.10.2026" data-month="10" data-subject="медіаграмотність">
+        <td class="date"><strong>19.10</strong><span>Пн</span></td>
+        <td><span class="period">2</span><br><span class="time">10:40–12:00</span></td>
+        <td><strong>Медіаграмотність</strong><div class="type">Лекція</div></td>
+        <td>Сенченко О.М.</td>
+        <td>510</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/85163629941?pwd=dUJ1TDJMQ3ZsbUNMRVUzcFRFNzB4QT09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 851 6362 9941</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="19.10.2026" data-month="10" data-subject="медіаграмотність">
+        <td class="date"><strong>19.10</strong><span>Пн</span></td>
+        <td><span class="period">3</span><br><span class="time">12:30–14:10</span></td>
+        <td><strong>Медіаграмотність</strong><div class="type">Практика</div></td>
+        <td>Сенченко О.М.</td>
+        <td>510</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/85163629941?pwd=dUJ1TDJMQ3ZsbUNMRVUzcFRFNzB4QT09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 851 6362 9941</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="19.10.2026" data-month="10" data-subject="інформаційні технології, системи та мережі">
+        <td class="date"><strong>19.10</strong><span>Пн</span></td>
+        <td><span class="period">4</span><br><span class="time">14:10–15:30</span></td>
+        <td><strong>Інформаційні технології, системи та мережі</strong><div class="type">Практика</div></td>
+        <td>Волинець В.О.</td>
+        <td>201</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/87937190793?pwd=9rlWpiJdAIP7r1oqybL2yTxOdQA27o.1" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 879 3719 0793</div>
+          <div class="meta"><b>Код:</b> Kuk-2024</div>
+        </td>
+      </tr>
+    
+      <tr data-date="20.10.2026" data-month="10" data-subject="маркетинг креативних галузей">
+        <td class="date"><strong>20.10</strong><span>Вт</span></td>
+        <td><span class="period">2</span><br><span class="time">10:40–12:00</span></td>
+        <td><strong>Маркетинг креативних галузей</strong><div class="type">Лекція</div></td>
+        <td>Касьян В.В.</td>
+        <td>503</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/83637607993?pwd=NGRIWGtaUkdQL0cvcEdFd1lEOHFDdz09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 836 3760 7993</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="20.10.2026" data-month="10" data-subject="штучний інтелект та креатив">
+        <td class="date"><strong>20.10</strong><span>Вт</span></td>
+        <td><span class="period">3</span><br><span class="time">12:30–14:10</span></td>
+        <td><strong>Штучний інтелект та креатив</strong><div class="type">Практика</div></td>
+        <td>Маранчак М.М.</td>
+        <td>510</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/89975434341?pwd=Q0xGeC9weFllOXZCY0U0Zmh4S24rUT09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 899 7543 4341</div>
+          <div class="meta"><b>Код:</b> Kuk-2023</div>
+        </td>
+      </tr>
+    
+      <tr data-date="21.10.2026" data-month="10" data-subject="соціальні комунікації">
+        <td class="date"><strong>21.10</strong><span>Ср</span></td>
+        <td><span class="period">2</span><br><span class="time">10:40–12:00</span></td>
+        <td><strong>Соціальні комунікації</strong><div class="type">Лекція</div></td>
+        <td>Маранчак М.М.</td>
+        <td>—</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/89975434341?pwd=Q0xGeC9weFllOXZCY0U0Zmh4S24rUT09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 899 7543 4341</div>
+          <div class="meta"><b>Код:</b> Kuk-2023</div>
+        </td>
+      </tr>
+    
+      <tr data-date="21.10.2026" data-month="10" data-subject="соціальні комунікації">
+        <td class="date"><strong>21.10</strong><span>Ср</span></td>
+        <td><span class="period">3</span><br><span class="time">12:30–14:10</span></td>
+        <td><strong>Соціальні комунікації</strong><div class="type">Лекція</div></td>
+        <td>Маранчак М.М.</td>
+        <td>—</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/89975434341?pwd=Q0xGeC9weFllOXZCY0U0Zmh4S24rUT09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 899 7543 4341</div>
+          <div class="meta"><b>Код:</b> Kuk-2023</div>
+        </td>
+      </tr>
+    
+      <tr data-date="22.10.2026" data-month="10" data-subject="корпоративні комунікації">
+        <td class="date"><strong>22.10</strong><span>Чт</span></td>
+        <td><span class="period">1</span><br><span class="time">09:00–10:20</span></td>
+        <td><strong>Корпоративні комунікації</strong><div class="type">Лекція</div></td>
+        <td>Воронова В.В.</td>
+        <td>504</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/83568494398?pwd=OVlYaFZwUG9FNk5uOElYRlRidkNOdz09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 835 6849 4398</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="22.10.2026" data-month="10" data-subject="корпоративні комунікації">
+        <td class="date"><strong>22.10</strong><span>Чт</span></td>
+        <td><span class="period">2</span><br><span class="time">10:40–12:00</span></td>
+        <td><strong>Корпоративні комунікації</strong><div class="type">Практика</div></td>
+        <td>Воронова В.В.</td>
+        <td>504</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/83568494398?pwd=OVlYaFZwUG9FNk5uOElYRlRidkNOdz09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 835 6849 4398</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="22.10.2026" data-month="10" data-subject="основи зв’язків з громадськістю та реклама">
+        <td class="date"><strong>22.10</strong><span>Чт</span></td>
+        <td><span class="period">3</span><br><span class="time">12:30–14:10</span></td>
+        <td><strong>Основи зв’язків з громадськістю та реклама</strong><div class="type">Практика</div></td>
+        <td>Пашкевич М.Ю.</td>
+        <td>504</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/85640710427?pwd=ajA5YUpwRGtpWTRXSVdHek9VYkFKQT09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 856 4071 0427</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="22.10.2026" data-month="10" data-subject="інформаційні технології, системи та мережі">
+        <td class="date"><strong>22.10</strong><span>Чт</span></td>
+        <td><span class="period">4</span><br><span class="time">14:10–15:30</span></td>
+        <td><strong>Інформаційні технології, системи та мережі</strong><div class="type">Практика</div></td>
+        <td>Волинець В.О.</td>
+        <td>201</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/87937190793?pwd=9rlWpiJdAIP7r1oqybL2yTxOdQA27o.1" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 879 3719 0793</div>
+          <div class="meta"><b>Код:</b> Kuk-2024</div>
+        </td>
+      </tr>
+    
+      <tr data-date="23.10.2026" data-month="10" data-subject="маркетинг креативних галузей">
+        <td class="date"><strong>23.10</strong><span>Пт</span></td>
+        <td><span class="period">2</span><br><span class="time">10:40–12:00</span></td>
+        <td><strong>Маркетинг креативних галузей</strong><div class="type">Лекція</div></td>
+        <td>Касьян В.В.</td>
+        <td>—</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/83637607993?pwd=NGRIWGtaUkdQL0cvcEdFd1lEOHFDdz09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 836 3760 7993</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="23.10.2026" data-month="10" data-subject="академічна культура">
+        <td class="date"><strong>23.10</strong><span>Пт</span></td>
+        <td><span class="period">3</span><br><span class="time">12:30–14:10</span></td>
+        <td><strong>Академічна культура</strong><div class="type">Лекція</div></td>
+        <td>Кундеревич О.В.</td>
+        <td>—</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/86713487034?pwd=d0lCaWp6QnBJRnVjVWk1T3dDUldlZz09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 867 1348 7034</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="26.10.2026" data-month="10" data-subject="медіаграмотність">
+        <td class="date"><strong>26.10</strong><span>Пн</span></td>
+        <td><span class="period">2</span><br><span class="time">10:40–12:00</span></td>
+        <td><strong>Медіаграмотність</strong><div class="type">Лекція</div></td>
+        <td>Сенченко О.М.</td>
+        <td>510</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/85163629941?pwd=dUJ1TDJMQ3ZsbUNMRVUzcFRFNzB4QT09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 851 6362 9941</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="26.10.2026" data-month="10" data-subject="медіаграмотність">
+        <td class="date"><strong>26.10</strong><span>Пн</span></td>
+        <td><span class="period">3</span><br><span class="time">12:30–14:10</span></td>
+        <td><strong>Медіаграмотність</strong><div class="type">Практика</div></td>
+        <td>Сенченко О.М.</td>
+        <td>510</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/85163629941?pwd=dUJ1TDJMQ3ZsbUNMRVUzcFRFNzB4QT09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 851 6362 9941</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="26.10.2026" data-month="10" data-subject="інформаційні технології, системи та мережі">
+        <td class="date"><strong>26.10</strong><span>Пн</span></td>
+        <td><span class="period">4</span><br><span class="time">14:10–15:30</span></td>
+        <td><strong>Інформаційні технології, системи та мережі</strong><div class="type">Практика</div></td>
+        <td>Волинець В.О.</td>
+        <td>201</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/87937190793?pwd=9rlWpiJdAIP7r1oqybL2yTxOdQA27o.1" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 879 3719 0793</div>
+          <div class="meta"><b>Код:</b> Kuk-2024</div>
+        </td>
+      </tr>
+    
+      <tr data-date="27.10.2026" data-month="10" data-subject="маркетинг креативних галузей">
+        <td class="date"><strong>27.10</strong><span>Вт</span></td>
+        <td><span class="period">2</span><br><span class="time">10:40–12:00</span></td>
+        <td><strong>Маркетинг креативних галузей</strong><div class="type">Лекція</div></td>
+        <td>Касьян В.В.</td>
+        <td>503</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/83637607993?pwd=NGRIWGtaUkdQL0cvcEdFd1lEOHFDdz09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 836 3760 7993</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="27.10.2026" data-month="10" data-subject="штучний інтелект та креатив">
+        <td class="date"><strong>27.10</strong><span>Вт</span></td>
+        <td><span class="period">3</span><br><span class="time">12:30–14:10</span></td>
+        <td><strong>Штучний інтелект та креатив</strong><div class="type">Практика</div></td>
+        <td>Маранчак М.М.</td>
+        <td>510</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/89975434341?pwd=Q0xGeC9weFllOXZCY0U0Zmh4S24rUT09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 899 7543 4341</div>
+          <div class="meta"><b>Код:</b> Kuk-2023</div>
+        </td>
+      </tr>
+    
+      <tr data-date="28.10.2026" data-month="10" data-subject="історія україни">
+        <td class="date"><strong>28.10</strong><span>Ср</span></td>
+        <td><span class="period">1</span><br><span class="time">09:00–10:20</span></td>
+        <td><strong>Історія України</strong><div class="type">Лекція</div></td>
+        <td>Пилипів В.І.</td>
+        <td>—</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/84385147484?pwd=QmRDLzBUN3hYa1RmSUpnajhwQWljdz09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 843 8514 7484</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="28.10.2026" data-month="10" data-subject="соціальні комунікації">
+        <td class="date"><strong>28.10</strong><span>Ср</span></td>
+        <td><span class="period">2</span><br><span class="time">10:40–12:00</span></td>
+        <td><strong>Соціальні комунікації</strong><div class="type">Лекція</div></td>
+        <td>Маранчак М.М.</td>
+        <td>—</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/89975434341?pwd=Q0xGeC9weFllOXZCY0U0Zmh4S24rUT09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 899 7543 4341</div>
+          <div class="meta"><b>Код:</b> Kuk-2023</div>
+        </td>
+      </tr>
+    
+      <tr data-date="29.10.2026" data-month="10" data-subject="корпоративні комунікації">
+        <td class="date"><strong>29.10</strong><span>Чт</span></td>
+        <td><span class="period">1</span><br><span class="time">09:00–10:20</span></td>
+        <td><strong>Корпоративні комунікації</strong><div class="type">Лекція</div></td>
+        <td>Воронова В.В.</td>
+        <td>504</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/83568494398?pwd=OVlYaFZwUG9FNk5uOElYRlRidkNOdz09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 835 6849 4398</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="29.10.2026" data-month="10" data-subject="корпоративні комунікації">
+        <td class="date"><strong>29.10</strong><span>Чт</span></td>
+        <td><span class="period">2</span><br><span class="time">10:40–12:00</span></td>
+        <td><strong>Корпоративні комунікації</strong><div class="type">Практика</div></td>
+        <td>Воронова В.В.</td>
+        <td>504</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/83568494398?pwd=OVlYaFZwUG9FNk5uOElYRlRidkNOdz09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 835 6849 4398</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="29.10.2026" data-month="10" data-subject="основи журналістики">
+        <td class="date"><strong>29.10</strong><span>Чт</span></td>
+        <td><span class="period">3</span><br><span class="time">12:30–14:10</span></td>
+        <td><strong>Основи журналістики</strong><div class="type">Лекція</div></td>
+        <td>Редько Т.В.</td>
+        <td>504</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/88611970520?pwd=3ibCSJHaya6sUnhbEZzwEgUdjkWOVd.1" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 886 1197 0520</div>
+          <div class="meta"><b>Код:</b> Kuk-2026</div>
+        </td>
+      </tr>
+    
+      <tr data-date="29.10.2026" data-month="10" data-subject="основи журналістики">
+        <td class="date"><strong>29.10</strong><span>Чт</span></td>
+        <td><span class="period">4</span><br><span class="time">14:10–15:30</span></td>
+        <td><strong>Основи журналістики</strong><div class="type">Практика</div></td>
+        <td>Редько Т.В.</td>
+        <td>504</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/88611970520?pwd=3ibCSJHaya6sUnhbEZzwEgUdjkWOVd.1" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 886 1197 0520</div>
+          <div class="meta"><b>Код:</b> Kuk-2026</div>
+        </td>
+      </tr>
+    
+      <tr data-date="30.10.2026" data-month="10" data-subject="маркетинг креативних галузей">
+        <td class="date"><strong>30.10</strong><span>Пт</span></td>
+        <td><span class="period">2</span><br><span class="time">10:40–12:00</span></td>
+        <td><strong>Маркетинг креативних галузей</strong><div class="type">Лекція</div></td>
+        <td>Касьян В.В.</td>
+        <td>—</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/83637607993?pwd=NGRIWGtaUkdQL0cvcEdFd1lEOHFDdz09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 836 3760 7993</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="30.10.2026" data-month="10" data-subject="академічна культура">
+        <td class="date"><strong>30.10</strong><span>Пт</span></td>
+        <td><span class="period">3</span><br><span class="time">12:30–14:10</span></td>
+        <td><strong>Академічна культура</strong><div class="type">Лекція</div></td>
+        <td>Кундеревич О.В.</td>
+        <td>—</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/86713487034?pwd=d0lCaWp6QnBJRnVjVWk1T3dDUldlZz09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 867 1348 7034</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="02.11.2026" data-month="11" data-subject="основи зв’язків з громадськістю та реклама">
+        <td class="date"><strong>02.11</strong><span>Пн</span></td>
+        <td><span class="period">1</span><br><span class="time">09:00–10:20</span></td>
+        <td><strong>Основи зв’язків з громадськістю та реклама</strong><div class="type">Практика</div></td>
+        <td>Пашкевич М.Ю.</td>
+        <td>504</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/85640710427?pwd=ajA5YUpwRGtpWTRXSVdHek9VYkFKQT09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 856 4071 0427</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="02.11.2026" data-month="11" data-subject="медіаграмотність">
+        <td class="date"><strong>02.11</strong><span>Пн</span></td>
+        <td><span class="period">2</span><br><span class="time">10:40–12:00</span></td>
+        <td><strong>Медіаграмотність</strong><div class="type">Лекція</div></td>
+        <td>Сенченко О.М.</td>
+        <td>510</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/85163629941?pwd=dUJ1TDJMQ3ZsbUNMRVUzcFRFNzB4QT09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 851 6362 9941</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="02.11.2026" data-month="11" data-subject="медіаграмотність">
+        <td class="date"><strong>02.11</strong><span>Пн</span></td>
+        <td><span class="period">3</span><br><span class="time">12:30–14:10</span></td>
+        <td><strong>Медіаграмотність</strong><div class="type">Практика</div></td>
+        <td>Сенченко О.М.</td>
+        <td>510</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/85163629941?pwd=dUJ1TDJMQ3ZsbUNMRVUzcFRFNzB4QT09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 851 6362 9941</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="02.11.2026" data-month="11" data-subject="інформаційні технології, системи та мережі">
+        <td class="date"><strong>02.11</strong><span>Пн</span></td>
+        <td><span class="period">4</span><br><span class="time">14:10–15:30</span></td>
+        <td><strong>Інформаційні технології, системи та мережі</strong><div class="type">Практика</div></td>
+        <td>Волинець В.О.</td>
+        <td>201</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/87937190793?pwd=9rlWpiJdAIP7r1oqybL2yTxOdQA27o.1" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 879 3719 0793</div>
+          <div class="meta"><b>Код:</b> Kuk-2024</div>
+        </td>
+      </tr>
+    
+      <tr data-date="03.11.2026" data-month="11" data-subject="маркетинг креативних галузей">
+        <td class="date"><strong>03.11</strong><span>Вт</span></td>
+        <td><span class="period">2</span><br><span class="time">10:40–12:00</span></td>
+        <td><strong>Маркетинг креативних галузей</strong><div class="type">Лекція</div></td>
+        <td>Касьян В.В.</td>
+        <td>503</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/83637607993?pwd=NGRIWGtaUkdQL0cvcEdFd1lEOHFDdz09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 836 3760 7993</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="03.11.2026" data-month="11" data-subject="маркетинг креативних галузей">
+        <td class="date"><strong>03.11</strong><span>Вт</span></td>
+        <td><span class="period">3</span><br><span class="time">12:30–14:10</span></td>
+        <td><strong>Маркетинг креативних галузей</strong><div class="type">Практика</div></td>
+        <td>Касьян В.В.</td>
+        <td>503</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/83637607993?pwd=NGRIWGtaUkdQL0cvcEdFd1lEOHFDdz09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 836 3760 7993</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="04.11.2026" data-month="11" data-subject="історія україни">
+        <td class="date"><strong>04.11</strong><span>Ср</span></td>
+        <td><span class="period">1</span><br><span class="time">09:00–10:20</span></td>
+        <td><strong>Історія України</strong><div class="type">Лекція</div></td>
+        <td>Пилипів В.І.</td>
+        <td>—</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/84385147484?pwd=QmRDLzBUN3hYa1RmSUpnajhwQWljdz09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 843 8514 7484</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="04.11.2026" data-month="11" data-subject="соціальні комунікації">
+        <td class="date"><strong>04.11</strong><span>Ср</span></td>
+        <td><span class="period">2</span><br><span class="time">10:40–12:00</span></td>
+        <td><strong>Соціальні комунікації</strong><div class="type">Лекція</div></td>
+        <td>Маранчак М.М.</td>
+        <td>—</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/89975434341?pwd=Q0xGeC9weFllOXZCY0U0Zmh4S24rUT09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 899 7543 4341</div>
+          <div class="meta"><b>Код:</b> Kuk-2023</div>
+        </td>
+      </tr>
+    
+      <tr data-date="04.11.2026" data-month="11" data-subject="соціальні комунікації">
+        <td class="date"><strong>04.11</strong><span>Ср</span></td>
+        <td><span class="period">3</span><br><span class="time">12:30–14:10</span></td>
+        <td><strong>Соціальні комунікації</strong><div class="type">Лекція</div></td>
+        <td>Маранчак М.М.</td>
+        <td>—</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/89975434341?pwd=Q0xGeC9weFllOXZCY0U0Zmh4S24rUT09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 899 7543 4341</div>
+          <div class="meta"><b>Код:</b> Kuk-2023</div>
+        </td>
+      </tr>
+    
+      <tr data-date="05.11.2026" data-month="11" data-subject="корпоративні комунікації">
+        <td class="date"><strong>05.11</strong><span>Чт</span></td>
+        <td><span class="period">1</span><br><span class="time">09:00–10:20</span></td>
+        <td><strong>Корпоративні комунікації</strong><div class="type">Лекція</div></td>
+        <td>Воронова В.В.</td>
+        <td>504</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/83568494398?pwd=OVlYaFZwUG9FNk5uOElYRlRidkNOdz09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 835 6849 4398</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="05.11.2026" data-month="11" data-subject="корпоративні комунікації">
+        <td class="date"><strong>05.11</strong><span>Чт</span></td>
+        <td><span class="period">2</span><br><span class="time">10:40–12:00</span></td>
+        <td><strong>Корпоративні комунікації</strong><div class="type">Практика</div></td>
+        <td>Воронова В.В.</td>
+        <td>504</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/83568494398?pwd=OVlYaFZwUG9FNk5uOElYRlRidkNOdz09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 835 6849 4398</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="05.11.2026" data-month="11" data-subject="інформаційні технології, системи та мережі">
+        <td class="date"><strong>05.11</strong><span>Чт</span></td>
+        <td><span class="period">3</span><br><span class="time">12:30–14:10</span></td>
+        <td><strong>Інформаційні технології, системи та мережі</strong><div class="type">Практика</div></td>
+        <td>Волинець В.О.</td>
+        <td>201</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/87937190793?pwd=9rlWpiJdAIP7r1oqybL2yTxOdQA27o.1" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 879 3719 0793</div>
+          <div class="meta"><b>Код:</b> Kuk-2024</div>
+        </td>
+      </tr>
+    
+      <tr data-date="06.11.2026" data-month="11" data-subject="маркетинг креативних галузей">
+        <td class="date"><strong>06.11</strong><span>Пт</span></td>
+        <td><span class="period">2</span><br><span class="time">10:40–12:00</span></td>
+        <td><strong>Маркетинг креативних галузей</strong><div class="type">Лекція</div></td>
+        <td>Касьян В.В.</td>
+        <td>—</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/83637607993?pwd=NGRIWGtaUkdQL0cvcEdFd1lEOHFDdz09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 836 3760 7993</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="06.11.2026" data-month="11" data-subject="академічна культура">
+        <td class="date"><strong>06.11</strong><span>Пт</span></td>
+        <td><span class="period">3</span><br><span class="time">12:30–14:10</span></td>
+        <td><strong>Академічна культура</strong><div class="type">Лекція</div></td>
+        <td>Кундеревич О.В.</td>
+        <td>—</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/86713487034?pwd=d0lCaWp6QnBJRnVjVWk1T3dDUldlZz09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 867 1348 7034</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="09.11.2026" data-month="11" data-subject="основи зв’язків з громадськістю та реклама">
+        <td class="date"><strong>09.11</strong><span>Пн</span></td>
+        <td><span class="period">1</span><br><span class="time">09:00–10:20</span></td>
+        <td><strong>Основи зв’язків з громадськістю та реклама</strong><div class="type">Практика</div></td>
+        <td>Пашкевич М.Ю.</td>
+        <td>504</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/85640710427?pwd=ajA5YUpwRGtpWTRXSVdHek9VYkFKQT09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 856 4071 0427</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="09.11.2026" data-month="11" data-subject="медіаграмотність">
+        <td class="date"><strong>09.11</strong><span>Пн</span></td>
+        <td><span class="period">2</span><br><span class="time">10:40–12:00</span></td>
+        <td><strong>Медіаграмотність</strong><div class="type">Лекція</div></td>
+        <td>Сенченко О.М.</td>
+        <td>510</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/85163629941?pwd=dUJ1TDJMQ3ZsbUNMRVUzcFRFNzB4QT09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 851 6362 9941</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="09.11.2026" data-month="11" data-subject="медіаграмотність">
+        <td class="date"><strong>09.11</strong><span>Пн</span></td>
+        <td><span class="period">3</span><br><span class="time">12:30–14:10</span></td>
+        <td><strong>Медіаграмотність</strong><div class="type">Практика</div></td>
+        <td>Сенченко О.М.</td>
+        <td>510</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/85163629941?pwd=dUJ1TDJMQ3ZsbUNMRVUzcFRFNzB4QT09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 851 6362 9941</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="09.11.2026" data-month="11" data-subject="інформаційні технології, системи та мережі">
+        <td class="date"><strong>09.11</strong><span>Пн</span></td>
+        <td><span class="period">4</span><br><span class="time">14:10–15:30</span></td>
+        <td><strong>Інформаційні технології, системи та мережі</strong><div class="type">Практика</div></td>
+        <td>Волинець В.О.</td>
+        <td>201</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/87937190793?pwd=9rlWpiJdAIP7r1oqybL2yTxOdQA27o.1" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 879 3719 0793</div>
+          <div class="meta"><b>Код:</b> Kuk-2024</div>
+        </td>
+      </tr>
+    
+      <tr data-date="10.11.2026" data-month="11" data-subject="маркетинг креативних галузей">
+        <td class="date"><strong>10.11</strong><span>Вт</span></td>
+        <td><span class="period">2</span><br><span class="time">10:40–12:00</span></td>
+        <td><strong>Маркетинг креативних галузей</strong><div class="type">Лекція</div></td>
+        <td>Касьян В.В.</td>
+        <td>503</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/83637607993?pwd=NGRIWGtaUkdQL0cvcEdFd1lEOHFDdz09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 836 3760 7993</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="10.11.2026" data-month="11" data-subject="маркетинг креативних галузей">
+        <td class="date"><strong>10.11</strong><span>Вт</span></td>
+        <td><span class="period">3</span><br><span class="time">12:30–14:10</span></td>
+        <td><strong>Маркетинг креативних галузей</strong><div class="type">Практика</div></td>
+        <td>Касьян В.В.</td>
+        <td>503</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/83637607993?pwd=NGRIWGtaUkdQL0cvcEdFd1lEOHFDdz09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 836 3760 7993</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="11.11.2026" data-month="11" data-subject="історія україни">
+        <td class="date"><strong>11.11</strong><span>Ср</span></td>
+        <td><span class="period">1</span><br><span class="time">09:00–10:20</span></td>
+        <td><strong>Історія України</strong><div class="type">Лекція</div></td>
+        <td>Пилипів В.І.</td>
+        <td>—</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/84385147484?pwd=QmRDLzBUN3hYa1RmSUpnajhwQWljdz09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 843 8514 7484</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="11.11.2026" data-month="11" data-subject="соціальні комунікації">
+        <td class="date"><strong>11.11</strong><span>Ср</span></td>
+        <td><span class="period">2</span><br><span class="time">10:40–12:00</span></td>
+        <td><strong>Соціальні комунікації</strong><div class="type">Лекція</div></td>
+        <td>Маранчак М.М.</td>
+        <td>—</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/89975434341?pwd=Q0xGeC9weFllOXZCY0U0Zmh4S24rUT09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 899 7543 4341</div>
+          <div class="meta"><b>Код:</b> Kuk-2023</div>
+        </td>
+      </tr>
+    
+      <tr data-date="12.11.2026" data-month="11" data-subject="корпоративні комунікації">
+        <td class="date"><strong>12.11</strong><span>Чт</span></td>
+        <td><span class="period">1</span><br><span class="time">09:00–10:20</span></td>
+        <td><strong>Корпоративні комунікації</strong><div class="type">Лекція</div></td>
+        <td>Воронова В.В.</td>
+        <td>504</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/83568494398?pwd=OVlYaFZwUG9FNk5uOElYRlRidkNOdz09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 835 6849 4398</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="12.11.2026" data-month="11" data-subject="маркетинг креативних галузей">
+        <td class="date"><strong>12.11</strong><span>Чт</span></td>
+        <td><span class="period">2</span><br><span class="time">10:40–12:00</span></td>
+        <td><strong>Маркетинг креативних галузей</strong><div class="type">Лекція</div></td>
+        <td>Касьян В.В.</td>
+        <td>503</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/83637607993?pwd=NGRIWGtaUkdQL0cvcEdFd1lEOHFDdz09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 836 3760 7993</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="12.11.2026" data-month="11" data-subject="маркетинг креативних галузей">
+        <td class="date"><strong>12.11</strong><span>Чт</span></td>
+        <td><span class="period">3</span><br><span class="time">12:30–14:10</span></td>
+        <td><strong>Маркетинг креативних галузей</strong><div class="type">Практика</div></td>
+        <td>Касьян В.В.</td>
+        <td>503</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/83637607993?pwd=NGRIWGtaUkdQL0cvcEdFd1lEOHFDdz09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 836 3760 7993</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="13.11.2026" data-month="11" data-subject="академічна культура">
+        <td class="date"><strong>13.11</strong><span>Пт</span></td>
+        <td><span class="period">3</span><br><span class="time">12:30–14:10</span></td>
+        <td><strong>Академічна культура</strong><div class="type">Лекція</div></td>
+        <td>Кундеревич О.В.</td>
+        <td>—</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/86713487034?pwd=d0lCaWp6QnBJRnVjVWk1T3dDUldlZz09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 867 1348 7034</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="13.11.2026" data-month="11" data-subject="академічна культура">
+        <td class="date"><strong>13.11</strong><span>Пт</span></td>
+        <td><span class="period">4</span><br><span class="time">14:10–15:30</span></td>
+        <td><strong>Академічна культура</strong><div class="type">Лекція</div></td>
+        <td>Кундеревич О.В.</td>
+        <td>—</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/86713487034?pwd=d0lCaWp6QnBJRnVjVWk1T3dDUldlZz09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 867 1348 7034</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="16.11.2026" data-month="11" data-subject="основи зв’язків з громадськістю та реклама">
+        <td class="date"><strong>16.11</strong><span>Пн</span></td>
+        <td><span class="period">1</span><br><span class="time">09:00–10:20</span></td>
+        <td><strong>Основи зв’язків з громадськістю та реклама</strong><div class="type">Практика</div></td>
+        <td>Пашкевич М.Ю.</td>
+        <td>504</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/85640710427?pwd=ajA5YUpwRGtpWTRXSVdHek9VYkFKQT09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 856 4071 0427</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="16.11.2026" data-month="11" data-subject="медіаграмотність">
+        <td class="date"><strong>16.11</strong><span>Пн</span></td>
+        <td><span class="period">2</span><br><span class="time">10:40–12:00</span></td>
+        <td><strong>Медіаграмотність</strong><div class="type">Лекція</div></td>
+        <td>Сенченко О.М.</td>
+        <td>510</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/85163629941?pwd=dUJ1TDJMQ3ZsbUNMRVUzcFRFNzB4QT09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 851 6362 9941</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="16.11.2026" data-month="11" data-subject="медіаграмотність">
+        <td class="date"><strong>16.11</strong><span>Пн</span></td>
+        <td><span class="period">3</span><br><span class="time">12:30–14:10</span></td>
+        <td><strong>Медіаграмотність</strong><div class="type">Практика</div></td>
+        <td>Сенченко О.М.</td>
+        <td>510</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/85163629941?pwd=dUJ1TDJMQ3ZsbUNMRVUzcFRFNzB4QT09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 851 6362 9941</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="16.11.2026" data-month="11" data-subject="інформаційні технології, системи та мережі">
+        <td class="date"><strong>16.11</strong><span>Пн</span></td>
+        <td><span class="period">4</span><br><span class="time">14:10–15:30</span></td>
+        <td><strong>Інформаційні технології, системи та мережі</strong><div class="type">Практика</div></td>
+        <td>Волинець В.О.</td>
+        <td>201</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/87937190793?pwd=9rlWpiJdAIP7r1oqybL2yTxOdQA27o.1" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 879 3719 0793</div>
+          <div class="meta"><b>Код:</b> Kuk-2024</div>
+        </td>
+      </tr>
+    
+      <tr data-date="17.11.2026" data-month="11" data-subject="маркетинг креативних галузей">
+        <td class="date"><strong>17.11</strong><span>Вт</span></td>
+        <td><span class="period">2</span><br><span class="time">10:40–12:00</span></td>
+        <td><strong>Маркетинг креативних галузей</strong><div class="type">Лекція</div></td>
+        <td>Касьян В.В.</td>
+        <td>503</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/83637607993?pwd=NGRIWGtaUkdQL0cvcEdFd1lEOHFDdz09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 836 3760 7993</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="17.11.2026" data-month="11" data-subject="маркетинг креативних галузей">
+        <td class="date"><strong>17.11</strong><span>Вт</span></td>
+        <td><span class="period">3</span><br><span class="time">12:30–14:10</span></td>
+        <td><strong>Маркетинг креативних галузей</strong><div class="type">Практика</div></td>
+        <td>Касьян В.В.</td>
+        <td>503</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/83637607993?pwd=NGRIWGtaUkdQL0cvcEdFd1lEOHFDdz09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 836 3760 7993</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="18.11.2026" data-month="11" data-subject="історія україни">
+        <td class="date"><strong>18.11</strong><span>Ср</span></td>
+        <td><span class="period">1</span><br><span class="time">09:00–10:20</span></td>
+        <td><strong>Історія України</strong><div class="type">Лекція</div></td>
+        <td>Пилипів В.І.</td>
+        <td>—</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/84385147484?pwd=QmRDLzBUN3hYa1RmSUpnajhwQWljdz09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 843 8514 7484</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="18.11.2026" data-month="11" data-subject="соціальні комунікації">
+        <td class="date"><strong>18.11</strong><span>Ср</span></td>
+        <td><span class="period">2</span><br><span class="time">10:40–12:00</span></td>
+        <td><strong>Соціальні комунікації</strong><div class="type">Лекція</div></td>
+        <td>Маранчак М.М.</td>
+        <td>—</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/89975434341?pwd=Q0xGeC9weFllOXZCY0U0Zmh4S24rUT09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 899 7543 4341</div>
+          <div class="meta"><b>Код:</b> Kuk-2023</div>
+        </td>
+      </tr>
+    
+      <tr data-date="19.11.2026" data-month="11" data-subject="корпоративні комунікації">
+        <td class="date"><strong>19.11</strong><span>Чт</span></td>
+        <td><span class="period">1</span><br><span class="time">09:00–10:20</span></td>
+        <td><strong>Корпоративні комунікації</strong><div class="type">Практика</div></td>
+        <td>Воронова В.В.</td>
+        <td>504</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/83568494398?pwd=OVlYaFZwUG9FNk5uOElYRlRidkNOdz09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 835 6849 4398</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="19.11.2026" data-month="11" data-subject="корпоративні комунікації">
+        <td class="date"><strong>19.11</strong><span>Чт</span></td>
+        <td><span class="period">2</span><br><span class="time">10:40–12:00</span></td>
+        <td><strong>Корпоративні комунікації</strong><div class="type">Практика</div></td>
+        <td>Воронова В.В.</td>
+        <td>504</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/83568494398?pwd=OVlYaFZwUG9FNk5uOElYRlRidkNOdz09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 835 6849 4398</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="20.11.2026" data-month="11" data-subject="академічна культура">
+        <td class="date"><strong>20.11</strong><span>Пт</span></td>
+        <td><span class="period">3</span><br><span class="time">12:30–14:10</span></td>
+        <td><strong>Академічна культура</strong><div class="type">Лекція</div></td>
+        <td>Кундеревич О.В.</td>
+        <td>—</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/86713487034?pwd=d0lCaWp6QnBJRnVjVWk1T3dDUldlZz09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 867 1348 7034</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="20.11.2026" data-month="11" data-subject="академічна культура">
+        <td class="date"><strong>20.11</strong><span>Пт</span></td>
+        <td><span class="period">4</span><br><span class="time">14:10–15:30</span></td>
+        <td><strong>Академічна культура</strong><div class="type">Лекція</div></td>
+        <td>Кундеревич О.В.</td>
+        <td>—</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/86713487034?pwd=d0lCaWp6QnBJRnVjVWk1T3dDUldlZz09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 867 1348 7034</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="23.11.2026" data-month="11" data-subject="медіаграмотність">
+        <td class="date"><strong>23.11</strong><span>Пн</span></td>
+        <td><span class="period">2</span><br><span class="time">10:40–12:00</span></td>
+        <td><strong>Медіаграмотність</strong><div class="type">Лекція</div></td>
+        <td>Сенченко О.М.</td>
+        <td>510</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/85163629941?pwd=dUJ1TDJMQ3ZsbUNMRVUzcFRFNzB4QT09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 851 6362 9941</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="23.11.2026" data-month="11" data-subject="медіаграмотність">
+        <td class="date"><strong>23.11</strong><span>Пн</span></td>
+        <td><span class="period">3</span><br><span class="time">12:30–14:10</span></td>
+        <td><strong>Медіаграмотність</strong><div class="type">Практика</div></td>
+        <td>Сенченко О.М.</td>
+        <td>510</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/85163629941?pwd=dUJ1TDJMQ3ZsbUNMRVUzcFRFNzB4QT09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 851 6362 9941</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="23.11.2026" data-month="11" data-subject="інформаційні технології, системи та мережі">
+        <td class="date"><strong>23.11</strong><span>Пн</span></td>
+        <td><span class="period">4</span><br><span class="time">14:10–15:30</span></td>
+        <td><strong>Інформаційні технології, системи та мережі</strong><div class="type">Практика</div></td>
+        <td>Волинець В.О.</td>
+        <td>201</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/87937190793?pwd=9rlWpiJdAIP7r1oqybL2yTxOdQA27o.1" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 879 3719 0793</div>
+          <div class="meta"><b>Код:</b> Kuk-2024</div>
+        </td>
+      </tr>
+    
+      <tr data-date="24.11.2026" data-month="11" data-subject="маркетинг креативних галузей">
+        <td class="date"><strong>24.11</strong><span>Вт</span></td>
+        <td><span class="period">2</span><br><span class="time">10:40–12:00</span></td>
+        <td><strong>Маркетинг креативних галузей</strong><div class="type">Лекція</div></td>
+        <td>Касьян В.В.</td>
+        <td>503</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/83637607993?pwd=NGRIWGtaUkdQL0cvcEdFd1lEOHFDdz09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 836 3760 7993</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="25.11.2026" data-month="11" data-subject="соціальні комунікації">
+        <td class="date"><strong>25.11</strong><span>Ср</span></td>
+        <td><span class="period">2</span><br><span class="time">10:40–12:00</span></td>
+        <td><strong>Соціальні комунікації</strong><div class="type">Лекція</div></td>
+        <td>Маранчак М.М.</td>
+        <td>—</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/89975434341?pwd=Q0xGeC9weFllOXZCY0U0Zmh4S24rUT09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 899 7543 4341</div>
+          <div class="meta"><b>Код:</b> Kuk-2023</div>
+        </td>
+      </tr>
+    
+      <tr data-date="27.11.2026" data-month="11" data-subject="академічна культура">
+        <td class="date"><strong>27.11</strong><span>Пт</span></td>
+        <td><span class="period">3</span><br><span class="time">12:30–14:10</span></td>
+        <td><strong>Академічна культура</strong><div class="type">Лекція</div></td>
+        <td>Кундеревич О.В.</td>
+        <td>—</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/86713487034?pwd=d0lCaWp6QnBJRnVjVWk1T3dDUldlZz09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 867 1348 7034</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      <tr data-date="27.11.2026" data-month="11" data-subject="академічна культура">
+        <td class="date"><strong>27.11</strong><span>Пт</span></td>
+        <td><span class="period">4</span><br><span class="time">14:10–15:30</span></td>
+        <td><strong>Академічна культура</strong><div class="type">Лекція</div></td>
+        <td>Кундеревич О.В.</td>
+        <td>—</td>
+        <td>
+          <a class="zoom" href="https://kuk-edu-ua.zoom.us/j/86713487034?pwd=d0lCaWp6QnBJRnVjVWk1T3dDUldlZz09" target="_blank" rel="noopener">Відкрити Zoom</a>
+          <div class="meta"><b>ID:</b> 867 1348 7034</div>
+          <div class="meta"><b>Код:</b> Kuk-2022</div>
+        </td>
+      </tr>
+    
+      
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="footer">
+    Джерело: завантажений PDF із розкладом занять. Дані перенесені без зміни назв предметів,
+    дат, викладачів, аудиторій та реквізитів Zoom. Для окремих занять аудиторія в документі не вказана — позначено «—».
+  </div>
+</div>
+
+<script>
+const search = document.getElementById('search');
+const rows = Array.from(document.querySelectorAll('#schedule tr'));
+const count = document.getElementById('count');
+const monthRadios = Array.from(document.querySelectorAll('input[name="month"]'));
+
+function currentMonth() {
+  const checked = monthRadios.find(r => r.checked);
+  return checked ? checked.id.replace('m-', '') : 'all';
+}
+
+function applyFilters() {
+  const q = search.value.trim().toLocaleLowerCase('uk-UA');
+  const month = currentMonth();
+  let n = 0;
+
+  rows.forEach(row => {
+    const monthOk = month === 'all' || row.dataset.month === month;
+    const textOk = !q || row.textContent.toLocaleLowerCase('uk-UA').includes(q);
+    const ok = monthOk && textOk;
+
+    row.classList.toggle('search-hidden', !ok);
+    if (ok) n++;
+  });
+
+  count.textContent = n;
+}
+
+function runSearch() {
+  applyFilters();
+}
+
+search.addEventListener('input', runSearch);
+search.addEventListener('keyup', runSearch);
+search.addEventListener('change', runSearch);
+search.addEventListener('search', runSearch);
+document.getElementById('searchBtn').addEventListener('click', runSearch);
+
+document.getElementById('clearBtn').addEventListener('click', function() {
+  search.value = '';
+  applyFilters();
+  search.focus();
+});
+
+document.querySelectorAll('#schedule .meta').forEach(m => { if (m.textContent.indexOf('Код') !== -1) m.classList.add('is-code'); });
+document.querySelectorAll('#schedule tr > td:nth-child(5)').forEach(td => { if (td.textContent.trim() === '—') td.classList.add('no-room'); });
+monthRadios.forEach(radio => radio.addEventListener('change', applyFilters));
+// Запасний варіант для iOS: перемикаємо місяць явно по тапу на вкладку
+document.querySelectorAll('.month-tabs label').forEach(function(lb) {
+  lb.addEventListener('click', function(e) {
+    const r = document.getElementById(lb.getAttribute('for'));
+    if (r) { e.preventDefault(); r.checked = true; applyFilters(); }
+  });
+});
+applyFilters();
+
+// Код доступу вже вшитий у посилання (параметр pwd), тож Zoom входить без запиту пароля.
+// Додатково копіюємо код у буфер обміну при натисканні на «Відкрити Zoom» / на сам код — на випадок, якщо Zoom усе ж його запитає.
+const toast = document.createElement('div');
+toast.className = 'zoom-toast';
+document.body.appendChild(toast);
+let toastTimer;
+function showToast(msg) {
+  toast.textContent = msg;
+  toast.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.remove('show'), 2200);
+}
+function copyText(text) {
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      return navigator.clipboard.writeText(text).catch(function() {});
+    }
+  } catch (e) {}
+  const ta = document.createElement('textarea');
+  ta.value = text; ta.readOnly = true; ta.style.position = 'fixed'; ta.style.opacity = '0'; ta.style.fontSize = '16px';
+  document.body.appendChild(ta); ta.focus(); ta.select(); ta.setSelectionRange(0, text.length);
+  try { document.execCommand('copy'); } catch (e) {}
+  document.body.removeChild(ta);
+  return Promise.resolve();
+}
+function codeFromCell(cell) {
+  const metas = cell.querySelectorAll('.meta');
+  for (const m of metas) {
+    if (m.textContent.includes('Код')) return m.textContent.replace('Код:', '').trim();
+  }
+  return '';
+}
+document.getElementById('schedule').addEventListener('click', function(e) {
+  const link = e.target.closest('a.zoom');
+  const meta = e.target.closest('.meta');
+  const cell = e.target.closest('td');
+  if (!cell) return;
+  if (link) {
+    const code = codeFromCell(cell);
+    if (code) { copyText(code).then(() => showToast('Код ' + code + ' скопійовано')).catch(() => {}); }
+  } else if (meta && meta.textContent.includes('Код')) {
+    const code = codeFromCell(cell);
+    copyText(code).then(() => showToast('Код ' + code + ' скопійовано')).catch(() => {});
+  }
+});
+
+// Автоматично відкриваємо поточний місяць і підсвічуємо/прокручуємо до поточної дати
+// (якщо в сьогоднішній день пар немає — до найближчого наступного дня з парами).
+function rowTime(row) {
+  const [d, m, y] = row.dataset.date.split('.').map(Number);
+  return new Date(y, m - 1, d).getTime();
+}
+function focusToday(scroll) {
+  const now = new Date();
+  const todayTs = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+  const sorted = rows.filter(r => r.dataset.date).sort((a, b) => rowTime(a) - rowTime(b));
+  if (!sorted.length) return;
+  rows.forEach(r => r.classList.remove('is-today'));
+
+  // цільова дата: сьогодні або найближча наступна; якщо семестр завершився — остання
+  let target = sorted.find(r => rowTime(r) >= todayTs) || sorted[sorted.length - 1];
+  const targetTs = rowTime(target);
+
+  // перемикаємо місяць цільової дати
+  const radio = document.getElementById('m-' + target.dataset.month);
+  if (radio && !radio.checked) { radio.checked = true; }
+  search.value = '';
+  applyFilters();
+
+  const group = sorted.filter(r => rowTime(r) === targetTs);
+  group.forEach(r => r.classList.add('is-today'));
+
+  if (scroll) {
+    const bar = document.querySelector('.controls');
+    const head = document.querySelector('thead');
+    const offset = (bar ? bar.offsetHeight : 0) + (head ? head.offsetHeight : 0) + 8;
+    const y = group[0].getBoundingClientRect().top + window.scrollY - offset;
+    window.scrollTo({ top: Math.max(0, y), behavior: 'auto' });
+  }
+}
+document.getElementById('todayBtn').addEventListener('click', function() {
+  focusToday(true);
+});
+focusToday(true);
+window.addEventListener('load', () => focusToday(true));
+</script>
+</body>
+</html>
